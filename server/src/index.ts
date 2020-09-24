@@ -26,6 +26,7 @@ import { UserResolver } from "./resolvers/user";
 import { createUserLoader } from "./utils/createUserLoader";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { SubscriptionResolver } from "./resolvers/subscription";
+import { useGetPositions } from "./utils/useGetPositions";
 
 const main = async () => {
   const conn = await createConnection({
@@ -45,6 +46,7 @@ const main = async () => {
 
   const RedisStore = connectRedis(session);
   const redis = new Redis();
+  await redis.flushall();
 
   app.use(
     cors({
@@ -83,6 +85,10 @@ const main = async () => {
     res.send("hello");
   });
 
+  await redis.set("subscribers", 0);
+  await redis.set("positions", "random text");
+  await redis.expire("positions", 10);
+
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [
@@ -94,29 +100,34 @@ const main = async () => {
       pubSub: pubsub,
       validate: false,
     }),
-    context: ({ req, res }) => ({
-      req,
-      res,
-      redis,
-      pubsub,
-      userLoader: createUserLoader(),
-      updootLoader: createUpdootLoader(),
-    }),
+    context: ({ req, res }) => {
+      return {
+        req,
+        res,
+        redis,
+        pubsub,
+        userLoader: createUserLoader(),
+        updootLoader: createUpdootLoader(),
+      };
+    },
     subscriptions: {
       async onConnect(connectionParams, webSocket: any) {
         console.log(
           "connected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        setInterval(() => {
-          pubsub.publish("KANYE", null);
-        }, 5000);
+        redis.incr("subscribers");
+        const subscribers = await redis.get("subscribers");
+        console.log("subscribers: ", subscribers);
       },
-      onDisconnect(webSocket: any) {
+      async onDisconnect(webSocket: any) {
         console.log(
           "disconnected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
+        redis.decr("subscribers");
+        const subscribers = await redis.get("subscribers");
+        console.log("subscribers: ", subscribers);
       },
     },
   });
@@ -126,6 +137,14 @@ const main = async () => {
   httpServer.listen(4000, () => {
     console.log("server started on localhost:4000");
   });
+  setInterval(async () => {
+    const response = await useGetPositions();
+    const feed = JSON.stringify(response);
+    await redis.set("positions", feed);
+    pubsub.publish("POSITIONS", null);
+  }, 10000);
+  const positions = await redis.get("positions");
+  console.log(positions !== "null" ? positions : "empty");
 };
 
 main().catch((error) => {

@@ -23,52 +23,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubscriptionResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-const useGetKanye_1 = require("../utils/useGetKanye");
+const useGetPositions_1 = require("../utils/useGetPositions");
 let SubscriptionResolver = class SubscriptionResolver {
-    time() {
+    getpositions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const date = new Date();
-            const time = date.toISOString();
-            return time;
+            const cache = yield ctx.redis.get("positions");
+            if (cache) {
+                return cache;
+            }
+            else {
+                const response = yield useGetPositions_1.useGetPositions();
+                const feed = JSON.stringify(response);
+                yield ctx.redis.set("positions", feed);
+                yield ctx.redis.expire("positions", 10);
+                return feed;
+            }
         });
     }
-    kanye(ctx) {
+    positions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tweet = yield useGetKanye_1.useGetKanye();
-            return tweet;
-        });
-    }
-    query() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return "user query";
+            const cache = yield ctx.redis.get("positions");
+            return cache;
         });
     }
 };
 __decorate([
-    type_graphql_1.Subscription(() => String, {
-        topics: "TIME",
-    }),
+    type_graphql_1.Query(() => String),
+    __param(0, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], SubscriptionResolver.prototype, "time", null);
+], SubscriptionResolver.prototype, "getpositions", null);
 __decorate([
     type_graphql_1.Subscription(() => String, {
-        topics: "KANYE",
+        topics: "POSITIONS",
     }),
     __param(0, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], SubscriptionResolver.prototype, "kanye", null);
-__decorate([
-    type_graphql_1.Subscription(() => String, {
-        topics: "QUERY",
-    }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], SubscriptionResolver.prototype, "query", null);
+], SubscriptionResolver.prototype, "positions", null);
 SubscriptionResolver = __decorate([
     type_graphql_1.Resolver()
 ], SubscriptionResolver);

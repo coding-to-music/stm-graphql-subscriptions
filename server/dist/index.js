@@ -33,6 +33,7 @@ const user_1 = require("./resolvers/user");
 const createUserLoader_1 = require("./utils/createUserLoader");
 const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 const subscription_1 = require("./resolvers/subscription");
+const useGetPositions_1 = require("./utils/useGetPositions");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -48,6 +49,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
     const redis = new ioredis_1.default();
+    yield redis.flushall();
     app.use(cors_1.default({
         origin: "http://localhost:3000",
         credentials: true,
@@ -79,6 +81,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.get("/", (_, res) => {
         res.send("hello");
     });
+    yield redis.set("subscribers", 0);
+    yield redis.set("positions", "random text");
+    yield redis.expire("positions", 10);
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
             resolvers: [
@@ -90,25 +95,32 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             pubSub: pubsub,
             validate: false,
         }),
-        context: ({ req, res }) => ({
-            req,
-            res,
-            redis,
-            pubsub,
-            userLoader: createUserLoader_1.createUserLoader(),
-            updootLoader: createUpdootLoader_1.createUpdootLoader(),
-        }),
+        context: ({ req, res }) => {
+            return {
+                req,
+                res,
+                redis,
+                pubsub,
+                userLoader: createUserLoader_1.createUserLoader(),
+                updootLoader: createUpdootLoader_1.createUpdootLoader(),
+            };
+        },
         subscriptions: {
             onConnect(connectionParams, webSocket) {
                 return __awaiter(this, void 0, void 0, function* () {
                     console.log("connected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
-                    setInterval(() => {
-                        pubsub.publish("KANYE", null);
-                    }, 5000);
+                    redis.incr("subscribers");
+                    const subscribers = yield redis.get("subscribers");
+                    console.log("subscribers: ", subscribers);
                 });
             },
             onDisconnect(webSocket) {
-                console.log("disconnected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
+                return __awaiter(this, void 0, void 0, function* () {
+                    console.log("disconnected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
+                    redis.decr("subscribers");
+                    const subscribers = yield redis.get("subscribers");
+                    console.log("subscribers: ", subscribers);
+                });
             },
         },
     });
@@ -118,6 +130,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     httpServer.listen(4000, () => {
         console.log("server started on localhost:4000");
     });
+    setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield useGetPositions_1.useGetPositions();
+        const feed = JSON.stringify(response);
+        yield redis.set("positions", feed);
+        pubsub.publish("POSITIONS", null);
+    }), 10000);
+    const positions = yield redis.get("positions");
+    console.log(positions !== "null" ? positions : "empty");
 });
 main().catch((error) => {
     console.error(error);
