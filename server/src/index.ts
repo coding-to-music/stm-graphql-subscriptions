@@ -138,13 +138,14 @@ const main = async () => {
     console.log("server started on localhost:4000");
   });
   setInterval(async () => {
-    const response = await useGetPositions();
-    const feed = JSON.stringify(response);
-    await redis.set("positions", feed);
-    pubsub.publish("POSITIONS", null);
+    const subscribers = await redis.get("subscribers");
+    if (subscribers > 0) {
+      const response = await useGetPositions();
+      const feed = JSON.stringify(response);
+      await redis.set("positions", feed);
+      pubsub.publish("POSITIONS", null);
+    }
   }, 10000);
-  const positions = await redis.get("positions");
-  console.log(positions !== "null" ? positions : "empty");
 };
 
 main().catch((error) => {

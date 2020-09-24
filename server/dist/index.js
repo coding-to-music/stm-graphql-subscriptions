@@ -131,13 +131,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log("server started on localhost:4000");
     });
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield useGetPositions_1.useGetPositions();
-        const feed = JSON.stringify(response);
-        yield redis.set("positions", feed);
-        pubsub.publish("POSITIONS", null);
+        const subscribers = yield redis.get("subscribers");
+        if (subscribers > 0) {
+            const response = yield useGetPositions_1.useGetPositions();
+            const feed = JSON.stringify(response);
+            yield redis.set("positions", feed);
+            pubsub.publish("POSITIONS", null);
+        }
     }), 10000);
-    const positions = yield redis.get("positions");
-    console.log(positions !== "null" ? positions : "empty");
 });
 main().catch((error) => {
     console.error(error);
