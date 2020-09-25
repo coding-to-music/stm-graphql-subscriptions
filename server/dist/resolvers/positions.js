@@ -23,7 +23,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-const useGetPositions_1 = require("../utils/useGetPositions");
+const fs_1 = require("fs");
 const feedParser = (response) => {
     const timestamp = response.header.timestamp.low;
     const count = response.entity.length;
@@ -151,8 +151,8 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const response = yield useGetPositions_1.useGetPositions();
-                const feed = feedParser(response);
+                const json = yield fs_1.promises.readFile("feed.json", "utf-8");
+                const feed = JSON.parse(json);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;
@@ -167,8 +167,8 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const response = yield useGetPositions_1.useGetPositions();
-                const feed = feedParser(response);
+                const json = yield fs_1.promises.readFile("feed.json", "utf-8");
+                const feed = JSON.parse(json);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;
