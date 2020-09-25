@@ -1,6 +1,10 @@
 import { Flex, useColorMode } from "@chakra-ui/core";
 
-export const Container = (props) => {
+interface ContainerProps {
+  props: any;
+}
+
+export const Container: React.FC<ContainerProps> = (props) => {
   const { colorMode } = useColorMode();
 
   const bgColor = { light: "gray.50", dark: "gray.900" };

@@ -10,7 +10,6 @@ import {
   DrawerBody,
   DrawerFooter,
   useDisclosure,
-  Box,
   Flex,
 } from "@chakra-ui/core";
 import { useLogoutMutation } from "../generated/graphql";
