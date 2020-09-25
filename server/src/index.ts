@@ -27,6 +27,7 @@ import { createUserLoader } from "./utils/createUserLoader";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
+import { promises as fs } from "fs";
 
 const main = async () => {
   const conn = await createConnection({
@@ -135,9 +136,9 @@ const main = async () => {
   setInterval(async () => {
     const subscribers = await redis.get("subscribers");
     if (subscribers > 0) {
-      const response = await useGetPositions();
-      const feed = JSON.stringify(response);
-      await redis.set("positions", feed);
+      const json = await fs.readFile("./feed.json", "utf-8");
+      const feed = JSON.parse(json);
+      await redis.set("positions", JSON.stringify(feed));
       pubsub.publish("POSITIONS", null);
     }
   }, 10000);

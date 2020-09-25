@@ -33,7 +33,7 @@ const user_1 = require("./resolvers/user");
 const createUserLoader_1 = require("./utils/createUserLoader");
 const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 const positions_1 = require("./resolvers/positions");
-const useGetPositions_1 = require("./utils/useGetPositions");
+const fs_1 = require("fs");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -128,9 +128,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         const subscribers = yield redis.get("subscribers");
         if (subscribers > 0) {
-            const response = yield useGetPositions_1.useGetPositions();
-            const feed = JSON.stringify(response);
-            yield redis.set("positions", feed);
+            const json = yield fs_1.promises.readFile("./feed.json", "utf-8");
+            const feed = JSON.parse(json);
+            yield redis.set("positions", JSON.stringify(feed));
             pubsub.publish("POSITIONS", null);
         }
     }), 10000);

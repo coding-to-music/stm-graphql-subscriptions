@@ -151,7 +151,7 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const json = yield fs_1.promises.readFile("feed.json", "utf-8");
+                const json = yield fs_1.promises.readFile("./feed.json", "utf-8");
                 const feed = JSON.parse(json);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
@@ -167,7 +167,7 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const json = yield fs_1.promises.readFile("feed.json", "utf-8");
+                const json = yield fs_1.promises.readFile("./feed.json", "utf-8");
                 const feed = JSON.parse(json);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
@@ -184,7 +184,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PositionsResolver.prototype, "getpositions", null);
 __decorate([
-    type_graphql_1.Subscription(() => String, {
+    type_graphql_1.Subscription(() => Feed, {
         topics: "POSITIONS",
     }),
     __param(0, type_graphql_1.Ctx()),

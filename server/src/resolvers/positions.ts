@@ -105,7 +105,7 @@ export class PositionsResolver {
       // const response = await useGetPositions();
       // const feed = feedParser(response);
       // mock data from file
-      const json = await fs.readFile("feed.json", "utf-8");
+      const json = await fs.readFile("./feed.json", "utf-8");
       const feed = JSON.parse(json);
       await ctx.redis.set("positions", JSON.stringify(feed));
       await ctx.redis.expire("positions", 10);
@@ -113,7 +113,7 @@ export class PositionsResolver {
     }
   }
 
-  @Subscription(() => String, {
+  @Subscription(() => Feed, {
     topics: "POSITIONS",
   })
   async positions(@Ctx() ctx: any): Promise<any> {
@@ -125,7 +125,7 @@ export class PositionsResolver {
       // const response = await useGetPositions();
       // const feed = feedParser(response);
       // mock data from file
-      const json = await fs.readFile("feed.json", "utf-8");
+      const json = await fs.readFile("./feed.json", "utf-8");
       const feed = JSON.parse(json);
       await ctx.redis.set("positions", JSON.stringify(feed));
       await ctx.redis.expire("positions", 10);

@@ -171,7 +171,7 @@ export type UsernamePasswordInput = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  positions: Scalars['String'];
+  positions: Feed;
 };
 
 export type PostSnippetFragment = (
@@ -382,7 +382,18 @@ export type PositionsSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 export type PositionsSubscription = (
   { __typename?: 'Subscription' }
-  & Pick<Subscription, 'positions'>
+  & { positions: (
+    { __typename?: 'Feed' }
+    & Pick<Feed, 'timestamp' | 'count'>
+    & { feed?: Maybe<Array<(
+      { __typename?: 'Vehicle' }
+      & Pick<Vehicle, 'timestamp' | 'id' | 'routeId'>
+      & { position?: Maybe<(
+        { __typename?: 'Position' }
+        & Pick<Position, 'latitude' | 'longitude'>
+      )> }
+    )>> }
+  ) }
 );
 
 export const PostSnippetFragmentDoc = gql`
@@ -872,7 +883,19 @@ export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
 export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
 export const PositionsDocument = gql`
     subscription Positions {
-  positions
+  positions {
+    timestamp
+    count
+    feed {
+      timestamp
+      id
+      routeId
+      position {
+        latitude
+        longitude
+      }
+    }
+  }
 }
     `;
 
