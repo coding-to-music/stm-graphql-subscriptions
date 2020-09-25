@@ -11,7 +11,7 @@ const initialViewState = {
   latitude: 45.56,
   zoom: 11,
   pitch: 0,
-  bearing: -58,
+  bearing: -57.5,
 };
 
 interface MapProps {

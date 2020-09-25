@@ -17,6 +17,7 @@ export type Query = {
   posts: PaginatedPosts;
   post?: Maybe<Post>;
   me?: Maybe<User>;
+  getpositions: Feed;
 };
 
 
@@ -57,6 +58,11 @@ export type User = {
   email: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+};
+
+export type Feed = {
+  __typename?: 'Feed';
+  feed: Scalars['String'];
 };
 
 export type Mutation = {
@@ -138,6 +144,11 @@ export type UsernamePasswordInput = {
   email: Scalars['String'];
   username: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  positions: Scalars['String'];
 };
 
 export type PostSnippetFragment = (
@@ -278,6 +289,17 @@ export type VoteMutation = (
   & Pick<Mutation, 'vote'>
 );
 
+export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Unnamed_1_Query = (
+  { __typename?: 'Query' }
+  & { getpositions: (
+    { __typename?: 'Feed' }
+    & Pick<Feed, 'feed'>
+  ) }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -322,6 +344,14 @@ export type PostsQuery = (
       & PostSnippetFragment
     )> }
   ) }
+);
+
+export type Unnamed_2_SubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Unnamed_2_Subscription = (
+  { __typename?: 'Subscription' }
+  & Pick<Subscription, 'positions'>
 );
 
 export const PostSnippetFragmentDoc = gql`

@@ -25,7 +25,7 @@ import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import { createUserLoader } from "./utils/createUserLoader";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
-import { SubscriptionResolver } from "./resolvers/subscription";
+import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
 
 const main = async () => {
@@ -91,12 +91,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [
-        HelloResolver,
-        PostResolver,
-        UserResolver,
-        SubscriptionResolver,
-      ],
+      resolvers: [HelloResolver, PostResolver, UserResolver, PositionsResolver],
       pubSub: pubsub,
       validate: false,
     }),

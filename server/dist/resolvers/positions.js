@@ -24,6 +24,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const useGetPositions_1 = require("../utils/useGetPositions");
+let Feed = class Feed {
+};
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], Feed.prototype, "feed", void 0);
+Feed = __decorate([
+    type_graphql_1.ObjectType()
+], Feed);
 let PositionsResolver = class PositionsResolver {
     getpositions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,10 +42,10 @@ let PositionsResolver = class PositionsResolver {
             }
             else {
                 const response = yield useGetPositions_1.useGetPositions();
-                const feed = JSON.stringify(response);
+                const feed = JSON.stringify(response.entity);
                 yield ctx.redis.set("positions", feed);
                 yield ctx.redis.expire("positions", 10);
-                return feed;
+                return { feed: feed };
             }
         });
     }
@@ -48,7 +57,7 @@ let PositionsResolver = class PositionsResolver {
     }
 };
 __decorate([
-    type_graphql_1.Query(() => String),
+    type_graphql_1.Query(() => Feed),
     __param(0, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -67,4 +76,4 @@ PositionsResolver = __decorate([
     type_graphql_1.Resolver()
 ], PositionsResolver);
 exports.PositionsResolver = PositionsResolver;
-//# sourceMappingURL=subscription.js.map
+//# sourceMappingURL=positions.js.map

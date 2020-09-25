@@ -1,19 +1,32 @@
-import { Ctx, Resolver, Subscription, Query } from "type-graphql";
+import {
+  Ctx,
+  Resolver,
+  Subscription,
+  Query,
+  ObjectType,
+  Field,
+} from "type-graphql";
 import { useGetPositions } from "../utils/useGetPositions";
 
+@ObjectType()
+class Feed {
+  @Field({ nullable: true })
+  feed?: string;
+}
+
 @Resolver()
-export class SubscriptionResolver {
-  @Query(() => String)
+export class PositionsResolver {
+  @Query(() => Feed)
   async getpositions(@Ctx() ctx: any) {
     const cache = await ctx.redis.get("positions");
     if (cache) {
       return cache;
     } else {
       const response = await useGetPositions();
-      const feed = JSON.stringify(response);
+      const feed = JSON.stringify(response.entity);
       await ctx.redis.set("positions", feed);
       await ctx.redis.expire("positions", 10);
-      return feed;
+      return { feed: feed };
     }
   }
 

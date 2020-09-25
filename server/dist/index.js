@@ -32,7 +32,7 @@ const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const createUserLoader_1 = require("./utils/createUserLoader");
 const createUpdootLoader_1 = require("./utils/createUpdootLoader");
-const subscription_1 = require("./resolvers/subscription");
+const positions_1 = require("./resolvers/positions");
 const useGetPositions_1 = require("./utils/useGetPositions");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
@@ -86,12 +86,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield redis.expire("positions", 10);
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [
-                hello_1.HelloResolver,
-                post_1.PostResolver,
-                user_1.UserResolver,
-                subscription_1.SubscriptionResolver,
-            ],
+            resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver, positions_1.PositionsResolver],
             pubSub: pubsub,
             validate: false,
         }),
