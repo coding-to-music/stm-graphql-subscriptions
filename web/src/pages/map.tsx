@@ -4,6 +4,8 @@ import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
 import { DeckGL } from "deck.gl";
 
+const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
 const initialViewState = {
   longitude: -73.645,
   latitude: 45.56,
@@ -14,10 +16,9 @@ const initialViewState = {
 
 interface MapProps {
   defaultColor: string;
-  MAPBOX_ACCESS_TOKEN: string;
 }
 
-const Map: React.FC<MapProps> = ({ defaultColor, MAPBOX_ACCESS_TOKEN }) => {
+const Map: React.FC<MapProps> = ({ defaultColor }) => {
   return (
     <Layout defaultColor={defaultColor}>
       <DeckGL initialViewState={initialViewState} controller={true}>

@@ -3,8 +3,6 @@ import theme from "../theme";
 import Cookies from "universal-cookie";
 import "./_app.css";
 
-const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
 // initialColorMode added as prop to override default light mode - see below
 
 function App({ Component, pageProps, initialColorMode }: any) {
@@ -31,7 +29,6 @@ App.getInitialProps = async ({ Component, ctx }: any) => {
   return {
     pageProps: {
       defaultColor: "purple",
-      MAPBOX_ACCESS_TOKEN: MAPBOX_ACCESS_TOKEN,
     },
     initialColorMode: isDarkMode === "true" ? "dark" : "light",
   };
