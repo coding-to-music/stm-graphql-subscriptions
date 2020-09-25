@@ -24,35 +24,127 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const useGetPositions_1 = require("../utils/useGetPositions");
-let Feed = class Feed {
+let Position = class Position {
 };
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", Number)
+], Position.prototype, "latitude", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", Number)
+], Position.prototype, "longitude", void 0);
+Position = __decorate([
+    type_graphql_1.ObjectType()
+], Position);
+let Vehicle = class Vehicle {
+};
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "id", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", Boolean)
+], Vehicle.prototype, "isDeleted", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "tripId", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "startTime", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "startDate", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "routeId", void 0);
+__decorate([
+    type_graphql_1.Field(() => Position, { nullable: true }),
+    __metadata("design:type", Position)
+], Vehicle.prototype, "position", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "currentStopSequence", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "currentStatus", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "timestamp", void 0);
 __decorate([
     type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
+], Vehicle.prototype, "vehicleId", void 0);
+Vehicle = __decorate([
+    type_graphql_1.ObjectType()
+], Vehicle);
+let Feed = class Feed {
+};
+__decorate([
+    type_graphql_1.Field(() => [Vehicle], { nullable: true }),
+    __metadata("design:type", Array)
 ], Feed.prototype, "feed", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", Number)
+], Feed.prototype, "timestamp", void 0);
 Feed = __decorate([
     type_graphql_1.ObjectType()
 ], Feed);
 let PositionsResolver = class PositionsResolver {
     getpositions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const cache = yield ctx.redis.get("positions");
-            if (cache) {
-                return cache;
-            }
-            else {
-                const response = yield useGetPositions_1.useGetPositions();
-                const feed = JSON.stringify(response.entity);
-                yield ctx.redis.set("positions", feed);
-                yield ctx.redis.expire("positions", 10);
-                return { feed: feed };
-            }
+            const response = yield useGetPositions_1.useGetPositions();
+            const timestamp = response.header.timetamp;
+            const feed = response.entity.map((entity) => {
+                const id = entity.id;
+                const isDeleted = entity.isDeleted;
+                const tripId = entity.vehicle.trip.tripId;
+                const startTime = entity.vehicle.trip.startTime;
+                const startDate = entity.vehicle.trip.startDate;
+                const routeId = entity.vehicle.trip.routeId;
+                const latitude = entity.vehicle.position.latitude;
+                const longitude = entity.vehicle.position.longitude;
+                const currentStopSequence = entity.vehicle.trip.currentStopSequence;
+                const currentStatus = entity.vehicle.trip.currentStatus;
+                const vehicleTimestamp = entity.vehicle.timestamp.low;
+                const vehicleId = entity.vehicle.vehicle.id;
+                return {
+                    id: id,
+                    isDeleted: isDeleted,
+                    tripId: tripId,
+                    startTime: startTime,
+                    startDate: startDate,
+                    routeId: routeId,
+                    position: {
+                        latitude: latitude,
+                        longitude: longitude,
+                    },
+                    currentStopSequence: currentStopSequence,
+                    currentStatus: currentStatus,
+                    timestamp: vehicleTimestamp,
+                    vehicleId: vehicleId,
+                };
+            });
+            return {
+                feed: feed,
+                timestamp: timestamp,
+            };
         });
     }
     positions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
             const cache = yield ctx.redis.get("positions");
-            return cache;
+            const json = JSON.parse(cache);
+            return { feed: json.feed, timestamp: json.timestamp };
         });
     }
 };
