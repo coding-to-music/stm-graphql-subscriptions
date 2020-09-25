@@ -1,5 +1,15 @@
-{
+query GetPositions {
   getpositions {
-    feed
+    timestamp
+    count
+    feed {
+      timestamp
+      id
+      routeId
+      position {
+        latitude
+        longitude
+      }
+    }
   }
 }

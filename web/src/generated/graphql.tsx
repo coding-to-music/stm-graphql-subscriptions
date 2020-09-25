@@ -62,7 +62,30 @@ export type User = {
 
 export type Feed = {
   __typename?: 'Feed';
-  feed: Scalars['String'];
+  feed?: Maybe<Array<Vehicle>>;
+  timestamp?: Maybe<Scalars['Float']>;
+  count?: Maybe<Scalars['Float']>;
+};
+
+export type Vehicle = {
+  __typename?: 'Vehicle';
+  id?: Maybe<Scalars['String']>;
+  isDeleted?: Maybe<Scalars['Boolean']>;
+  tripId?: Maybe<Scalars['String']>;
+  startTime?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
+  routeId?: Maybe<Scalars['String']>;
+  position?: Maybe<Position>;
+  currentStopSequence?: Maybe<Scalars['Float']>;
+  currentStatus?: Maybe<Scalars['Float']>;
+  timestamp?: Maybe<Scalars['Float']>;
+  vehicleId?: Maybe<Scalars['String']>;
+};
+
+export type Position = {
+  __typename?: 'Position';
+  latitude?: Maybe<Scalars['Float']>;
+  longitude?: Maybe<Scalars['Float']>;
 };
 
 export type Mutation = {
@@ -289,14 +312,22 @@ export type VoteMutation = (
   & Pick<Mutation, 'vote'>
 );
 
-export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPositionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type Unnamed_1_Query = (
+export type GetPositionsQuery = (
   { __typename?: 'Query' }
   & { getpositions: (
     { __typename?: 'Feed' }
-    & Pick<Feed, 'feed'>
+    & Pick<Feed, 'timestamp' | 'count'>
+    & { feed?: Maybe<Array<(
+      { __typename?: 'Vehicle' }
+      & Pick<Vehicle, 'timestamp' | 'id' | 'routeId'>
+      & { position?: Maybe<(
+        { __typename?: 'Position' }
+        & Pick<Position, 'latitude' | 'longitude'>
+      )> }
+    )>> }
   ) }
 );
 
@@ -346,10 +377,10 @@ export type PostsQuery = (
   ) }
 );
 
-export type Unnamed_2_SubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type PositionsSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type Unnamed_2_Subscription = (
+export type PositionsSubscription = (
   { __typename?: 'Subscription' }
   & Pick<Subscription, 'positions'>
 );
@@ -685,6 +716,48 @@ export function useVoteMutation(baseOptions?: Apollo.MutationHookOptions<VoteMut
 export type VoteMutationHookResult = ReturnType<typeof useVoteMutation>;
 export type VoteMutationResult = Apollo.MutationResult<VoteMutation>;
 export type VoteMutationOptions = Apollo.BaseMutationOptions<VoteMutation, VoteMutationVariables>;
+export const GetPositionsDocument = gql`
+    query GetPositions {
+  getpositions {
+    timestamp
+    count
+    feed {
+      timestamp
+      id
+      routeId
+      position {
+        latitude
+        longitude
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPositionsQuery__
+ *
+ * To run a query within a React component, call `useGetPositionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPositionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPositionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetPositionsQuery(baseOptions?: Apollo.QueryHookOptions<GetPositionsQuery, GetPositionsQueryVariables>) {
+        return Apollo.useQuery<GetPositionsQuery, GetPositionsQueryVariables>(GetPositionsDocument, baseOptions);
+      }
+export function useGetPositionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPositionsQuery, GetPositionsQueryVariables>) {
+          return Apollo.useLazyQuery<GetPositionsQuery, GetPositionsQueryVariables>(GetPositionsDocument, baseOptions);
+        }
+export type GetPositionsQueryHookResult = ReturnType<typeof useGetPositionsQuery>;
+export type GetPositionsLazyQueryHookResult = ReturnType<typeof useGetPositionsLazyQuery>;
+export type GetPositionsQueryResult = Apollo.QueryResult<GetPositionsQuery, GetPositionsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -797,3 +870,29 @@ export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Post
 export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
 export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
 export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
+export const PositionsDocument = gql`
+    subscription Positions {
+  positions
+}
+    `;
+
+/**
+ * __usePositionsSubscription__
+ *
+ * To run a query within a React component, call `usePositionsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `usePositionsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePositionsSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePositionsSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PositionsSubscription, PositionsSubscriptionVariables>) {
+        return Apollo.useSubscription<PositionsSubscription, PositionsSubscriptionVariables>(PositionsDocument, baseOptions);
+      }
+export type PositionsSubscriptionHookResult = ReturnType<typeof usePositionsSubscription>;
+export type PositionsSubscriptionResult = Apollo.SubscriptionResult<PositionsSubscription>;

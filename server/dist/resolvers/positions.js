@@ -24,14 +24,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const useGetPositions_1 = require("../utils/useGetPositions");
+const feedParser = (response) => {
+    const timestamp = response.header.timestamp.low;
+    const count = response.entity.length;
+    const feed = response.entity.map((entity) => {
+        const id = entity.id;
+        const isDeleted = entity.isDeleted;
+        const tripId = entity.vehicle.trip.tripId;
+        const startTime = entity.vehicle.trip.startTime;
+        const startDate = entity.vehicle.trip.startDate;
+        const routeId = entity.vehicle.trip.routeId;
+        const latitude = entity.vehicle.position.latitude;
+        const longitude = entity.vehicle.position.longitude;
+        const currentStopSequence = entity.vehicle.trip.currentStopSequence;
+        const currentStatus = entity.vehicle.trip.currentStatus;
+        const vehicleTimestamp = entity.vehicle.timestamp.low;
+        const vehicleId = entity.vehicle.vehicle.id;
+        return {
+            id: id,
+            isDeleted: isDeleted,
+            tripId: tripId,
+            startTime: startTime,
+            startDate: startDate,
+            routeId: routeId,
+            position: {
+                latitude: latitude,
+                longitude: longitude,
+            },
+            currentStopSequence: currentStopSequence,
+            currentStatus: currentStatus,
+            timestamp: vehicleTimestamp,
+            vehicleId: vehicleId,
+        };
+    });
+    return {
+        timestamp: timestamp,
+        count: count,
+        feed: feed,
+    };
+};
 let Position = class Position {
 };
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Number)
 ], Position.prototype, "latitude", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Number)
 ], Position.prototype, "longitude", void 0);
 Position = __decorate([
@@ -40,27 +79,27 @@ Position = __decorate([
 let Vehicle = class Vehicle {
 };
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], Vehicle.prototype, "id", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Boolean)
 ], Vehicle.prototype, "isDeleted", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], Vehicle.prototype, "tripId", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], Vehicle.prototype, "startTime", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], Vehicle.prototype, "startDate", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], Vehicle.prototype, "routeId", void 0);
 __decorate([
@@ -76,7 +115,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Vehicle.prototype, "currentStatus", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Number)
 ], Vehicle.prototype, "timestamp", void 0);
 __decorate([
@@ -93,58 +132,47 @@ __decorate([
     __metadata("design:type", Array)
 ], Feed.prototype, "feed", void 0);
 __decorate([
-    type_graphql_1.Field(),
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Number)
 ], Feed.prototype, "timestamp", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], Feed.prototype, "count", void 0);
 Feed = __decorate([
     type_graphql_1.ObjectType()
 ], Feed);
 let PositionsResolver = class PositionsResolver {
     getpositions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield useGetPositions_1.useGetPositions();
-            const timestamp = response.header.timetamp;
-            const feed = response.entity.map((entity) => {
-                const id = entity.id;
-                const isDeleted = entity.isDeleted;
-                const tripId = entity.vehicle.trip.tripId;
-                const startTime = entity.vehicle.trip.startTime;
-                const startDate = entity.vehicle.trip.startDate;
-                const routeId = entity.vehicle.trip.routeId;
-                const latitude = entity.vehicle.position.latitude;
-                const longitude = entity.vehicle.position.longitude;
-                const currentStopSequence = entity.vehicle.trip.currentStopSequence;
-                const currentStatus = entity.vehicle.trip.currentStatus;
-                const vehicleTimestamp = entity.vehicle.timestamp.low;
-                const vehicleId = entity.vehicle.vehicle.id;
-                return {
-                    id: id,
-                    isDeleted: isDeleted,
-                    tripId: tripId,
-                    startTime: startTime,
-                    startDate: startDate,
-                    routeId: routeId,
-                    position: {
-                        latitude: latitude,
-                        longitude: longitude,
-                    },
-                    currentStopSequence: currentStopSequence,
-                    currentStatus: currentStatus,
-                    timestamp: vehicleTimestamp,
-                    vehicleId: vehicleId,
-                };
-            });
-            return {
-                feed: feed,
-                timestamp: timestamp,
-            };
+            const cache = yield ctx.redis.get("positions");
+            if (cache) {
+                const feed = JSON.parse(cache);
+                return feed;
+            }
+            else {
+                const response = yield useGetPositions_1.useGetPositions();
+                const feed = feedParser(response);
+                yield ctx.redis.set("positions", JSON.stringify(feed));
+                yield ctx.redis.expire("positions", 10);
+                return feed;
+            }
         });
     }
     positions(ctx) {
         return __awaiter(this, void 0, void 0, function* () {
             const cache = yield ctx.redis.get("positions");
-            const json = JSON.parse(cache);
-            return { feed: json.feed, timestamp: json.timestamp };
+            if (cache) {
+                const feed = JSON.parse(cache);
+                return feed;
+            }
+            else {
+                const response = yield useGetPositions_1.useGetPositions();
+                const feed = feedParser(response);
+                yield ctx.redis.set("positions", JSON.stringify(feed));
+                yield ctx.redis.expire("positions", 10);
+                return feed;
+            }
         });
     }
 };
