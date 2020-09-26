@@ -23,46 +23,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-const fs_1 = require("fs");
-const feedParser = (response) => {
-    const timestamp = response.header.timestamp.low;
-    const count = response.entity.length;
-    const feed = response.entity.map((entity) => {
-        const id = entity.id;
-        const isDeleted = entity.isDeleted;
-        const tripId = entity.vehicle.trip.tripId;
-        const startTime = entity.vehicle.trip.startTime;
-        const startDate = entity.vehicle.trip.startDate;
-        const routeId = entity.vehicle.trip.routeId;
-        const latitude = entity.vehicle.position.latitude;
-        const longitude = entity.vehicle.position.longitude;
-        const currentStopSequence = entity.vehicle.trip.currentStopSequence;
-        const currentStatus = entity.vehicle.trip.currentStatus;
-        const vehicleTimestamp = entity.vehicle.timestamp.low;
-        const vehicleId = entity.vehicle.vehicle.id;
-        return {
-            id: id,
-            isDeleted: isDeleted,
-            tripId: tripId,
-            startTime: startTime,
-            startDate: startDate,
-            routeId: routeId,
-            position: {
-                latitude: latitude,
-                longitude: longitude,
-            },
-            currentStopSequence: currentStopSequence,
-            currentStatus: currentStatus,
-            timestamp: vehicleTimestamp,
-            vehicleId: vehicleId,
-        };
-    });
-    return {
-        timestamp: timestamp,
-        count: count,
-        feed: feed,
-    };
-};
+const useGetPositions_1 = require("../utils/useGetPositions");
+const feedParser_1 = require("../utils/feedParser");
 let Position = class Position {
 };
 __decorate([
@@ -151,8 +113,8 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const json = yield fs_1.promises.readFile("./feed.json", "utf-8");
-                const feed = JSON.parse(json);
+                const response = yield useGetPositions_1.useGetPositions();
+                const feed = feedParser_1.feedParser(response);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;
@@ -167,8 +129,8 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const json = yield fs_1.promises.readFile("./feed.json", "utf-8");
-                const feed = JSON.parse(json);
+                const response = yield useGetPositions_1.useGetPositions();
+                const feed = feedParser_1.feedParser(response);
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;

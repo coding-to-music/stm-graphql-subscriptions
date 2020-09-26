@@ -3,7 +3,7 @@ import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
 import { DeckGL, ScatterplotLayer } from "deck.gl";
-import { useGetPositionsQuery } from "../generated/graphql";
+import { usePositionsSubscription } from "../generated/graphql";
 import { easeBackOut } from "d3";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -21,11 +21,12 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
-  const { data, loading, error } = useGetPositionsQuery({});
+  const { data, loading, error } = usePositionsSubscription({});
   const [vehicles, setVehicles] = useState();
   useEffect(() => {
     if (data) {
-      const positions = data.getpositions.feed.map((vehicle: any) => {
+      console.log(data.positions.timestamp);
+      const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
           route: vehicle.routeId,
@@ -75,4 +76,4 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   );
 };
 
-export default withApollo({ ssr: true })(Map);
+export default withApollo({ ssr: false })(Map);
