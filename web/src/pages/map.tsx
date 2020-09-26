@@ -40,11 +40,13 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     new ScatterplotLayer({
       id: "scatterplot-layer",
       data: vehicles,
-      getRadius: 15,
-      radiusMaxPixels: 15,
+      radiusScale: 2,
+      radiusMinPixels: 1,
+      radiusMaxPixels: 5,
+      getRadius: 25,
       getFillColor: [255, 99, 71],
       pickable: true,
-      onClick: ({ object }: any) => console.log(object),
+      onClick: ({ object }: any) => console.log(object.route),
       autoHighlight: true,
       transitions: {
         getRadius: {
