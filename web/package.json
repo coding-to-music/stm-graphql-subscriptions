@@ -16,6 +16,7 @@
     "@turf/bbox": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@turf/turf": "^5.1.6",
+    "d3": "^6.2.0",
     "deck.gl": "^8.2.8",
     "emotion-theming": "^10.0.27",
     "formik": "^2.1.5",
