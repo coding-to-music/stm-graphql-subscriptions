@@ -8,7 +8,7 @@ import {
 } from "type-graphql";
 import { useGetPositions } from "../utils/useGetPositions";
 import { feedParser } from "../utils/feedParser";
-// import { promises as fs } from "fs";
+import { promises as fs } from "fs";
 
 @ObjectType()
 class Position {
@@ -66,8 +66,8 @@ export class PositionsResolver {
       const response = await useGetPositions();
       const feed = feedParser(response);
       // mock data from file
-      // const json = await fs.readFile("./feed.json", "utf-8");
-      // const feed = JSON.parse(json);
+      // const file = await fs.readFile("./feed.json", "utf-8");
+      // const feed = JSON.parse(file);
       await ctx.redis.set("positions", JSON.stringify(feed));
       await ctx.redis.expire("positions", 10);
       return feed;
@@ -86,8 +86,8 @@ export class PositionsResolver {
       const response = await useGetPositions();
       const feed = feedParser(response);
       // mock data from file
-      // const json = await fs.readFile("./feed.json", "utf-8");
-      // const feed = JSON.parse(json);
+      // const file = await fs.readFile("./feed.json", "utf-8");
+      // const feed = JSON.parse(file);
       await ctx.redis.set("positions", JSON.stringify(feed));
       await ctx.redis.expire("positions", 10);
       return feed;

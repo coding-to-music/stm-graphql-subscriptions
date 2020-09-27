@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
 import { DeckGL, ScatterplotLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
+import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -21,11 +22,32 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
-  const { data, loading, error } = usePositionsSubscription({});
   const [vehicles, setVehicles] = useState();
+  const { data, loading, error } = usePositionsSubscription({});
+  const {
+    data: qdata,
+    loading: qloading,
+    error: qerror,
+  } = useGetPositionsQuery({});
+
+  useEffect(() => {
+    if (qdata) {
+      const positions = qdata.getpositions.feed.map((vehicle: any) => {
+        return {
+          id: vehicle.id,
+          route: vehicle.routeId,
+          position: [vehicle.position.longitude, vehicle.position.latitude],
+        };
+      });
+      setVehicles(positions);
+    }
+  }, [qdata]);
+
   useEffect(() => {
     if (data) {
-      console.log(data.positions.timestamp);
+      console.log(
+        `vehicles: ${data.positions.count}, timestamp: ${data.positions.timestamp}`
+      );
       const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -76,4 +98,4 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   );
 };
 
-export default withApollo({ ssr: false })(Map);
+export default withApollo({ ssr: true })(Map);

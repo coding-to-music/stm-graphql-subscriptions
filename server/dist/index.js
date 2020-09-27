@@ -35,6 +35,7 @@ const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 const positions_1 = require("./resolvers/positions");
 const useGetPositions_1 = require("./utils/useGetPositions");
 const feedParser_1 = require("./utils/feedParser");
+const fs_1 = require("fs");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -113,8 +114,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             onDisconnect(webSocket) {
                 return __awaiter(this, void 0, void 0, function* () {
                     console.log("disconnected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
-                    redis.decr("subscribers");
-                    const subscribers = yield redis.get("subscribers");
+                    let subscribers = yield parseInt(redis.get("subscribers"));
+                    if (subscribers > 0) {
+                        redis.decr("subscribers");
+                        subscribers--;
+                    }
                     console.log("subscribers: ", subscribers);
                 });
             },
@@ -126,6 +130,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     httpServer.listen(4000, () => {
         console.log("server started on localhost:4000");
     });
+    const file = yield fs_1.promises.readFile("./feed.json", "utf-8");
+    const feed = JSON.parse(file);
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         const subscribers = yield redis.get("subscribers");
         if (subscribers > 0) {

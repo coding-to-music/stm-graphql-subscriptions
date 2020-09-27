@@ -28,7 +28,7 @@ import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
 import { feedParser } from "./utils/feedParser";
-// import { promises as fs } from "fs";
+import { promises as fs } from "fs";
 
 const main = async () => {
   const conn = await createConnection({
@@ -122,8 +122,11 @@ const main = async () => {
           "disconnected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        redis.decr("subscribers");
-        const subscribers = await redis.get("subscribers");
+        let subscribers = await parseInt(redis.get("subscribers"));
+        if (subscribers > 0) {
+          redis.decr("subscribers");
+          subscribers--;
+        }
         console.log("subscribers: ", subscribers);
       },
     },
@@ -134,12 +137,15 @@ const main = async () => {
   httpServer.listen(4000, () => {
     console.log("server started on localhost:4000");
   });
+  const file = await fs.readFile("./feed.json", "utf-8");
+  const feed = JSON.parse(file);
+  // let timestamp = feed.timestamp;
   setInterval(async () => {
     const subscribers = await redis.get("subscribers");
     if (subscribers > 0) {
-      // const json = await fs.readFile("./feed.json", "utf-8");
       const response = await useGetPositions();
       const feed = feedParser(response);
+      // feed.timestamp = timestamp++;
       await redis.set("positions", JSON.stringify(feed));
       await redis.expire("positions", 10);
       pubsub.publish("POSITIONS", null);
