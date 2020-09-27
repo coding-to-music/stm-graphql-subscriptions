@@ -32,6 +32,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata) {
+      console.log(
+        `vehicles: ${qdata.getpositions.count}, timestamp: ${qdata.getpositions.timestamp}`
+      );
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,

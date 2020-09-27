@@ -113,8 +113,9 @@ const main = async () => {
           "connected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        redis.incr("subscribers");
-        const subscribers = await redis.get("subscribers");
+        await redis.incr("subscribers");
+        const subs = await redis.get("subscribers");
+        const subscribers = parseInt(subs);
         console.log("subscribers: ", subscribers);
       },
       async onDisconnect(webSocket: any) {
@@ -122,9 +123,10 @@ const main = async () => {
           "disconnected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        let subscribers = await parseInt(redis.get("subscribers"));
+        const subs = await redis.get("subscribers");
+        let subscribers = parseInt(subs);
         if (subscribers > 0) {
-          redis.decr("subscribers");
+          await redis.decr("subscribers");
           subscribers--;
         }
         console.log("subscribers: ", subscribers);
