@@ -17,15 +17,22 @@ const initialViewState = {
   bearing: -57.5,
 };
 
+const line = [
+  {
+    start: [-73.964792, 45.413806],
+    end: [-73.48159, 45.701829],
+  },
+];
+
 interface MapProps {
   defaultColor: string;
 }
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
-  const [paths, setPaths] = useState();
-  const [time, setTime] = useState();
-  const [tripsData, setTripsData] = useState();
+  // const [paths, setPaths] = useState();
+  // const [time, setTime] = useState();
+  // const [tripsData, setTripsData] = useState();
   const { data, loading, error } = usePositionsSubscription({});
   const {
     data: qdata,
@@ -38,9 +45,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const currentTime = new Date(
         qdata.getpositions.timestamp * 1000
       ).toLocaleTimeString();
-      console.log(
-        `vehicles: ${qdata.getpositions.count}, timestamp: ${currentTime}`
-      );
+      console.log(`${qdata.getpositions.count} vehicles, ${currentTime}`);
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -50,15 +55,15 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      const trips = positions.reduce((accumulator, current) => {
-        const vehicle = {
-          id: current.id,
-          timestamp: [current.timestamp],
-          path: [current.position],
-        };
-        return Object.assign(accumulator, { [current.id]: vehicle });
-      }, {});
-      setPaths(trips);
+      // const trips = positions.reduce((accumulator, current) => {
+      //   const vehicle = {
+      //     id: current.id,
+      //     timestamp: [current.timestamp],
+      //     path: [current.position],
+      //   };
+      //   return Object.assign(accumulator, { [current.id]: vehicle });
+      // }, {});
+      // setPaths(trips);
     }
   }, [qdata]);
 
@@ -68,10 +73,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         data.positions.timestamp * 1000
       ).toLocaleTimeString();
 
-      console.log(
-        `vehicles: ${data.positions.count}, timestamp: ${currentTime}`
-      );
-      setTime(data.positions.timestamp);
+      console.log(`${data.positions.count} vehicles, ${currentTime}`);
+      // setTime(data.positions.timestamp);
       const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -81,22 +84,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      const trips = paths;
-      positions.forEach((entry) => {
-        if (entry.id in trips) {
-          trips[entry.id].timestamp.push(entry.timestamp);
-          trips[entry.id].path.push(entry.position);
-        } else {
-          trips[entry.id] = {
-            id: entry.id,
-            timestamp: [entry.timestamp],
-            path: [entry.position],
-          };
-        }
-      });
-      setPaths(trips);
-      const tripsArray = Object.values(trips);
-      setTripsData(tripsArray);
+      // const trips = paths;
+      // positions.forEach((entry) => {
+      //   if (entry.id in trips) {
+      //     trips[entry.id].timestamp.push(entry.timestamp);
+      //     trips[entry.id].path.push(entry.position);
+      //   } else {
+      //     trips[entry.id] = {
+      //       id: entry.id,
+      //       timestamp: [entry.timestamp],
+      //       path: [entry.position],
+      //     };
+      //   }
+      // });
+      // setPaths(trips);
+      // const tripsArray = Object.values(trips);
+      // setTripsData(tripsArray);
     }
   }, [data]);
 
@@ -120,13 +123,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       },
     }),
     new LineLayer({
-      id: "line-layer",
-      tripsData,
-      getWidth: 10,
-      getSourcePosition: (d) => d.path[0],
-      getTargetPosition: (d) => d.path[d.path.length - 1],
-      getColor: [0, 173, 230],
+      id: "test-line",
+      data: line,
       opacity: 0.8,
+      pickable: true,
+      getSourcePosition: (d) => d.start,
+      getTargetPosition: (d) => d.end,
+      getColor: [0, 173, 230],
+      getWidth: 2,
     }),
   ];
 
