@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
-import { DeckGL, ScatterplotLayer, TripsLayer } from "deck.gl";
+import { DeckGL, ScatterplotLayer, LineLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
@@ -35,8 +35,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata) {
+      const currentTime = new Date(
+        qdata.getpositions.timestamp * 1000
+      ).toLocaleTimeString();
       console.log(
-        `vehicles: ${qdata.getpositions.count}, timestamp: ${qdata.getpositions.timestamp}`
+        `vehicles: ${qdata.getpositions.count}, timestamp: ${currentTime}`
       );
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
@@ -61,8 +64,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (data) {
+      const currentTime = new Date(
+        data.positions.timestamp * 1000
+      ).toLocaleTimeString();
+
       console.log(
-        `vehicles: ${data.positions.count}, timestamp: ${data.positions.timestamp}`
+        `vehicles: ${data.positions.count}, timestamp: ${currentTime}`
       );
       setTime(data.positions.timestamp);
       const positions = data.positions.feed.map((vehicle: any) => {
@@ -88,7 +95,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         }
       });
       setPaths(trips);
-      setTripsData(Object.values(trips));
+      const tripsArray = Object.values(trips);
+      setTripsData(tripsArray);
     }
   }, [data]);
 
@@ -111,17 +119,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         },
       },
     }),
-    new TripsLayer({
-      id: "trips-layer",
+    new LineLayer({
+      id: "line-layer",
       tripsData,
-      getPath: (d) => d.path,
-      getTimestamps: (d) => d.timestamps,
+      getWidth: 10,
+      getSourcePosition: (d) => d.path[0],
+      getTargetPosition: (d) => d.path[d.path.length - 1],
       getColor: [0, 173, 230],
       opacity: 0.8,
-      widthMinPixels: 5,
-      rounded: true,
-      trailLength: 100000,
-      currentTime: time,
     }),
   ];
 
