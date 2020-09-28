@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
-import { DeckGL, ScatterplotLayer, LineLayer } from "deck.gl";
+import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
@@ -17,10 +17,14 @@ const initialViewState = {
   bearing: -57.5,
 };
 
-const line = [
+const path = [
   {
-    start: [-73.964792, 45.413806],
-    end: [-73.48159, 45.701829],
+    path: [
+      [-73.964792, 45.413806],
+      [-73.587076, 45.503546],
+      [-73.48159, 45.701829],
+    ],
+    name: "Montreal",
   },
 ];
 
@@ -122,15 +126,15 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         },
       },
     }),
-    new LineLayer({
-      id: "test-line",
-      data: line,
-      opacity: 0.8,
+    new PathLayer({
+      id: "path-layer",
+      data: path,
       pickable: true,
-      getSourcePosition: (d) => d.start,
-      getTargetPosition: (d) => d.end,
+      widthScale: 20,
+      widthMinPixels: 2,
+      getPath: (d) => d.path,
       getColor: [0, 173, 230],
-      getWidth: 2,
+      getWidth: (d) => 5,
     }),
   ];
 
