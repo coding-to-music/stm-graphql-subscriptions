@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
-import { DeckGL, ScatterplotLayer } from "deck.gl";
+import { DeckGL, ScatterplotLayer, TripsLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
@@ -23,6 +23,9 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
+  const [paths, setPaths] = useState();
+  const [time, setTime] = useState();
+  const [tripsData, setTripsData] = useState();
   const { data, loading, error } = usePositionsSubscription({});
   const {
     data: qdata,
@@ -38,11 +41,21 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
+          timestamp: vehicle.timestamp,
           route: vehicle.routeId,
           position: [vehicle.position.longitude, vehicle.position.latitude],
         };
       });
       setVehicles(positions);
+      const trips = positions.reduce((accumulator, current) => {
+        const vehicle = {
+          id: current.id,
+          timestamp: [current.timestamp],
+          path: [current.position],
+        };
+        return Object.assign(accumulator, { [current.id]: vehicle });
+      }, {});
+      setPaths(trips);
     }
   }, [qdata]);
 
@@ -51,14 +64,31 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       console.log(
         `vehicles: ${data.positions.count}, timestamp: ${data.positions.timestamp}`
       );
+      setTime(data.positions.timestamp);
       const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
+          timestamp: vehicle.timestamp,
           route: vehicle.routeId,
           position: [vehicle.position.longitude, vehicle.position.latitude],
         };
       });
       setVehicles(positions);
+      const trips = paths;
+      positions.forEach((entry) => {
+        if (entry.id in trips) {
+          trips[entry.id].timestamp.push(entry.timestamp);
+          trips[entry.id].path.push(entry.position);
+        } else {
+          trips[entry.id] = {
+            id: entry.id,
+            timestamp: [entry.timestamp],
+            path: [entry.position],
+          };
+        }
+      });
+      setPaths(trips);
+      setTripsData(Object.values(trips));
     }
   }, [data]);
 
@@ -80,6 +110,18 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           easing: easeBackOut,
         },
       },
+    }),
+    new TripsLayer({
+      id: "trips-layer",
+      tripsData,
+      getPath: (d) => d.path,
+      getTimestamps: (d) => d.timestamps,
+      getColor: [0, 173, 230],
+      opacity: 0.8,
+      widthMinPixels: 5,
+      rounded: true,
+      trailLength: 100000,
+      currentTime: time,
     }),
   ];
 
