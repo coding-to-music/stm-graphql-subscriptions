@@ -125,11 +125,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getFillColor: (d) =>
         keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
-      onClick: ({ object }: any) => {
-        const id = object.id;
-        const path = keyed.current[id].path;
-        console.log(path);
-      },
+      onClick: ({ object }: any) => console.log(`Route ${object.route}`),
       autoHighlight: true,
       transitions: {
         getRadius: {
