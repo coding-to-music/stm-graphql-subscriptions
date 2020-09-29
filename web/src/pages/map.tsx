@@ -34,7 +34,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
-  const keyed = useRef({});
+  const keyed: any = useRef({});
   const [paths, setPaths] = useState();
   const {
     data,
@@ -47,7 +47,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata && !vehicles) {
-      const positions: any = qdata.getpositions.feed.map((vehicle: any) => {
+      const positions: any = qdata.getpositions.feed?.map((vehicle: any) => {
         return {
           id: vehicle.id,
           timestamp: vehicle.timestamp,
@@ -72,7 +72,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   useEffect(() => {
     if (data && data.positions.timestamp) {
       const trips: any = keyed.current;
-      const positions: any = data.positions.feed.map((vehicle: any) => {
+      const positions: any = data.positions.feed?.map((vehicle: any) => {
         return {
           id: vehicle.id,
           timestamp: vehicle.timestamp,
@@ -122,7 +122,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       radiusMinPixels: 1,
       radiusMaxPixels: 5,
       getRadius: 25,
-      getFillColor: (d) =>
+      getFillColor: (d: any) =>
         keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
@@ -140,9 +140,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       pickable: true,
       widthScale: 5,
       widthMinPixels: 1,
-      getPath: (d) => d.path,
+      getPath: (d: any) => d.path,
       getColor: [0, 173, 230],
-      getWidth: (d) => 1,
+      getWidth: 1,
     }),
   ];
 
