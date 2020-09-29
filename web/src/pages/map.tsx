@@ -47,13 +47,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata && !vehicles) {
-      // const currentTime = new Date(
-      //   qdata.getpositions.timestamp * 1000
-      // ).toLocaleTimeString();
-      // console.log(
-      //   `initial query: ${qdata.getpositions.count} vehicles, ${currentTime}`
-      // );
-      const positions = qdata.getpositions.feed.map((vehicle: any) => {
+      const positions: any = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
           timestamp: vehicle.timestamp,
@@ -62,11 +56,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      const indexed = positions.reduce((accumulator, current) => {
+      const indexed = positions.reduce((accumulator: any, current: any) => {
         const vehicle = {
           id: current.id,
           timestamp: [current.timestamp],
           path: [current.position],
+          updated: false,
         };
         return Object.assign(accumulator, { [current.id]: vehicle });
       }, {});
@@ -76,11 +71,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (data && data.positions.timestamp) {
-      // const currentTime = new Date(
-      //   data.positions.timestamp * 1000
-      // ).toLocaleTimeString();
-      // console.log(`${data.positions.count} vehicles, ${currentTime}`);
-      const positions = data.positions.feed.map((vehicle: any) => {
+      const trips: any = keyed.current;
+      const positions: any = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
           timestamp: vehicle.timestamp,
@@ -89,21 +81,35 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      const trips = keyed.current;
-      positions.forEach((entry) => {
+      positions.forEach((entry: any) => {
         if (entry.id in trips) {
-          trips[entry.id].timestamp.push(entry.timestamp);
-          trips[entry.id].path.push(entry.position);
+          if (
+            JSON.stringify(entry.position) !==
+            JSON.stringify(
+              trips[entry.id].path[trips[entry.id].path.length - 1]
+            )
+          ) {
+            if (trips[entry.id].path.length > 2) {
+              trips[entry.id].path.shift();
+              trips[entry.id].timestamp.shift();
+            }
+            trips[entry.id].timestamp.push(entry.timestamp);
+            trips[entry.id].path.push(entry.position);
+            trips[entry.id].updated = true;
+          } else {
+            trips[entry.id].updated = false;
+          }
         } else {
           trips[entry.id] = {
             id: entry.id,
             timestamp: [entry.timestamp],
             path: [entry.position],
+            updated: true,
           };
         }
       });
       keyed.current = trips;
-      const tripValues = Object.values(trips);
+      const tripValues: any = Object.values(trips);
       setPaths(tripValues);
     }
   }, [data]);
@@ -116,9 +122,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       radiusMinPixels: 1,
       radiusMaxPixels: 5,
       getRadius: 25,
-      getFillColor: [255, 99, 71],
+      getFillColor: (d) =>
+        keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
-      onClick: ({ object }: any) => console.log(object.route),
+      onClick: ({ object }: any) => {
+        const id = object.id;
+        const path = keyed.current[id].path;
+        console.log(path);
+      },
       autoHighlight: true,
       transitions: {
         getRadius: {
