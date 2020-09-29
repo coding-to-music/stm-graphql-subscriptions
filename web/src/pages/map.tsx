@@ -47,12 +47,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata && !vehicles) {
-      const currentTime = new Date(
-        qdata.getpositions.timestamp * 1000
-      ).toLocaleTimeString();
-      console.log(
-        `initial query: ${qdata.getpositions.count} vehicles, ${currentTime}`
-      );
+      // const currentTime = new Date(
+      //   qdata.getpositions.timestamp * 1000
+      // ).toLocaleTimeString();
+      // console.log(
+      //   `initial query: ${qdata.getpositions.count} vehicles, ${currentTime}`
+      // );
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -76,10 +76,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (data && data.positions.timestamp) {
-      const currentTime = new Date(
-        data.positions.timestamp * 1000
-      ).toLocaleTimeString();
-      console.log(`${data.positions.count} vehicles, ${currentTime}`);
+      // const currentTime = new Date(
+      //   data.positions.timestamp * 1000
+      // ).toLocaleTimeString();
+      // console.log(`${data.positions.count} vehicles, ${currentTime}`);
       const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -105,7 +105,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       keyed.current = trips;
       const tripValues = Object.values(trips);
       setPaths(tripValues);
-      console.log(tripValues[0]);
     }
   }, [data]);
 
