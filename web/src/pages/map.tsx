@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
@@ -17,7 +17,7 @@ const initialViewState = {
   bearing: -57.5,
 };
 
-const path = [
+const testPath = [
   {
     path: [
       [-73.964792, 45.413806],
@@ -34,22 +34,25 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
-  // const [paths, setPaths] = useState();
-  // const [time, setTime] = useState();
-  // const [tripsData, setTripsData] = useState();
-  const { data, loading, error } = usePositionsSubscription({});
+  const keyed = useRef({});
+  const [paths, setPaths] = useState();
+  const {
+    data,
+    // loading, error
+  } = usePositionsSubscription({});
   const {
     data: qdata,
-    loading: qloading,
-    error: qerror,
+    // loading: qloading, error: qerror,
   } = useGetPositionsQuery({});
 
   useEffect(() => {
-    if (qdata) {
+    if (qdata && !vehicles) {
       const currentTime = new Date(
         qdata.getpositions.timestamp * 1000
       ).toLocaleTimeString();
-      console.log(`${qdata.getpositions.count} vehicles, ${currentTime}`);
+      console.log(
+        `initial query: ${qdata.getpositions.count} vehicles, ${currentTime}`
+      );
       const positions = qdata.getpositions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -59,26 +62,24 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      // const trips = positions.reduce((accumulator, current) => {
-      //   const vehicle = {
-      //     id: current.id,
-      //     timestamp: [current.timestamp],
-      //     path: [current.position],
-      //   };
-      //   return Object.assign(accumulator, { [current.id]: vehicle });
-      // }, {});
-      // setPaths(trips);
+      const indexed = positions.reduce((accumulator, current) => {
+        const vehicle = {
+          id: current.id,
+          timestamp: [current.timestamp],
+          path: [current.position],
+        };
+        return Object.assign(accumulator, { [current.id]: vehicle });
+      }, {});
+      keyed.current = indexed;
     }
   }, [qdata]);
 
   useEffect(() => {
-    if (data) {
+    if (data && data.positions.timestamp) {
       const currentTime = new Date(
         data.positions.timestamp * 1000
       ).toLocaleTimeString();
-
       console.log(`${data.positions.count} vehicles, ${currentTime}`);
-      // setTime(data.positions.timestamp);
       const positions = data.positions.feed.map((vehicle: any) => {
         return {
           id: vehicle.id,
@@ -88,22 +89,23 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         };
       });
       setVehicles(positions);
-      // const trips = paths;
-      // positions.forEach((entry) => {
-      //   if (entry.id in trips) {
-      //     trips[entry.id].timestamp.push(entry.timestamp);
-      //     trips[entry.id].path.push(entry.position);
-      //   } else {
-      //     trips[entry.id] = {
-      //       id: entry.id,
-      //       timestamp: [entry.timestamp],
-      //       path: [entry.position],
-      //     };
-      //   }
-      // });
-      // setPaths(trips);
-      // const tripsArray = Object.values(trips);
-      // setTripsData(tripsArray);
+      const trips = keyed.current;
+      positions.forEach((entry) => {
+        if (entry.id in trips) {
+          trips[entry.id].timestamp.push(entry.timestamp);
+          trips[entry.id].path.push(entry.position);
+        } else {
+          trips[entry.id] = {
+            id: entry.id,
+            timestamp: [entry.timestamp],
+            path: [entry.position],
+          };
+        }
+      });
+      keyed.current = trips;
+      const tripValues = Object.values(trips);
+      setPaths(tripValues);
+      console.log(tripValues[0]);
     }
   }, [data]);
 
@@ -128,13 +130,13 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new PathLayer({
       id: "path-layer",
-      data: path,
+      data: paths,
       pickable: true,
-      widthScale: 20,
-      widthMinPixels: 2,
+      widthScale: 5,
+      widthMinPixels: 1,
       getPath: (d) => d.path,
       getColor: [0, 173, 230],
-      getWidth: (d) => 5,
+      getWidth: (d) => 1,
     }),
   ];
 

@@ -8,7 +8,7 @@ import {
 } from "type-graphql";
 import { useGetPositions } from "../utils/useGetPositions";
 import { feedParser } from "../utils/feedParser";
-import { promises as fs } from "fs";
+// import { promises as fs } from "fs";
 
 @ObjectType()
 class Position {

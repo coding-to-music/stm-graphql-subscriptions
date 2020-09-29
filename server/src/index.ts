@@ -28,7 +28,7 @@ import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
 import { feedParser } from "./utils/feedParser";
-import { promises as fs } from "fs";
+// import { promises as fs } from "fs";
 
 const main = async () => {
   const conn = await createConnection({
@@ -139,15 +139,15 @@ const main = async () => {
   httpServer.listen(4000, () => {
     console.log("server started on localhost:4000");
   });
-  const file = await fs.readFile("./feed.json", "utf-8");
-  const feed = JSON.parse(file);
-  // let timestamp = feed.timestamp;
+  // const file = await fs.readFile("./feed.json", "utf-8");
+  // const feed = JSON.parse(file);
   setInterval(async () => {
     const subscribers = await redis.get("subscribers");
     if (subscribers > 0) {
       const response = await useGetPositions();
       const feed = feedParser(response);
-      // feed.timestamp = timestamp++;
+      const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
+      console.log(`${feed.count} vehicles, ${currentTime}`);
       await redis.set("positions", JSON.stringify(feed));
       await redis.expire("positions", 10);
       pubsub.publish("POSITIONS", null);
