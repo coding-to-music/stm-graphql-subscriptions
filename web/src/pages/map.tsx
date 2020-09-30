@@ -78,28 +78,31 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const positions: any = positionGenerator(data.positions.feed);
       setVehicles(positions);
       positions.forEach((entry: any) => {
-        if (entry.id in trips) {
-          const prevPositions = trips[entry.id].path;
-          const prevTimestamps = trips[entry.id].timestamp;
+        const id = entry.id;
+        const timestamp = entry.timestamp;
+        const position = entry.position;
+        if (id in trips) {
+          const prevPositions = trips[id].path;
+          const prevTimestamps = trips[id].timestamp;
           if (
-            JSON.stringify(entry.position) !==
+            JSON.stringify(position) !==
             JSON.stringify(prevPositions[prevPositions.length - 1])
           ) {
             if (prevPositions.length > 1) {
               prevPositions.shift();
               prevTimestamps.shift();
             }
-            prevTimestamps.push(entry.timestamp);
-            prevPositions.push(entry.position);
-            trips[entry.id].updated = true;
+            prevTimestamps.push(timestamp);
+            prevPositions.push(position);
+            trips[id].updated = true;
           } else {
-            trips[entry.id].updated = false;
+            trips[id].updated = false;
           }
         } else {
-          trips[entry.id] = {
-            id: entry.id,
-            timestamp: [entry.timestamp],
-            path: [entry.position],
+          trips[id] = {
+            id: id,
+            timestamp: [timestamp],
+            path: [position],
             updated: true,
           };
         }
