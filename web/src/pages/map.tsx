@@ -82,21 +82,20 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         const timestamp = entry.timestamp;
         const position = entry.position;
         if (id in trips) {
-          const prevPositions = trips[id].path;
-          const prevTimestamps = trips[id].timestamp;
-          if (
-            JSON.stringify(position) !==
-            JSON.stringify(prevPositions[prevPositions.length - 1])
-          ) {
+          const trip = trips[id];
+          const prevPositions = trip.path;
+          const lastPosition = prevPositions[prevPositions.length - 1];
+          const prevTimestamps = trip.timestamp;
+          if (JSON.stringify(position) !== JSON.stringify(lastPosition)) {
             if (prevPositions.length > 1) {
               prevPositions.shift();
               prevTimestamps.shift();
             }
             prevTimestamps.push(timestamp);
             prevPositions.push(position);
-            trips[id].updated = true;
+            trip.updated = true;
           } else {
-            trips[id].updated = false;
+            trip.updated = false;
           }
         } else {
           trips[id] = {
