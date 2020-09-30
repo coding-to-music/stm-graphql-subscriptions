@@ -6,6 +6,7 @@ import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
+import { Box, useColorMode } from "@chakra-ui/core";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -43,6 +44,11 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
+  const { colorMode } = useColorMode();
+  const bgColor = { light: "gray.50", dark: "gray.900" };
+  const color = { light: "black", dark: "white" };
+
+  const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
   const [paths, setPaths] = useState();
@@ -87,10 +93,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           const lastPosition = prevPositions[prevPositions.length - 1];
           const prevTimestamps = trip.timestamp;
           if (JSON.stringify(position) !== JSON.stringify(lastPosition)) {
-            if (prevPositions.length > 1) {
-              prevPositions.shift();
-              prevTimestamps.shift();
-            }
+            // if (prevPositions.length > 1) {
+            //   prevPositions.shift();
+            //   prevTimestamps.shift();
+            // }
             prevTimestamps.push(timestamp);
             prevPositions.push(position);
             trip.updated = true;
@@ -124,11 +130,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
-      onHover: ({ object }: any) => {
-        if (object && object.route) {
-          console.log(`Route ${object.route}`);
-        }
-      },
+      onHover: (info: any) => setHoverInfo(info),
       autoHighlight: true,
       transitions: {
         getRadius: {
@@ -143,7 +145,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       pickable: true,
       widthScale: 5,
       widthMinPixels: 1,
-      getPath: (d: any) => d.path,
+      getPath: (d: any) => d.path.slice(-3),
       getColor: [0, 173, 230],
       getWidth: 1,
     }),
@@ -161,6 +163,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           width={"100vw"}
           height={"100vh"}
         />
+        {hoverInfo?.object ? (
+          <Box
+            style={{
+              position: "absolute",
+              zIndex: 1,
+              pointerEvents: "none",
+              left: hoverInfo?.x,
+              top: hoverInfo?.y,
+            }}
+            bg={bgColor[colorMode]}
+            color={color[colorMode]}
+            p={1}
+          >
+            <Box>{`Route ${hoverInfo?.object.route}`}</Box>
+          </Box>
+        ) : null}
       </DeckGL>
     </Layout>
   );
