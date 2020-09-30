@@ -89,7 +89,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
               trips[entry.id].path[trips[entry.id].path.length - 1]
             )
           ) {
-            if (trips[entry.id].path.length > 2) {
+            if (trips[entry.id].path.length > 1) {
               trips[entry.id].path.shift();
               trips[entry.id].timestamp.shift();
             }
@@ -126,6 +126,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
+      onHover: ({ object }: any) => {
+        if (object && object.route) {
+          console.log(`Route ${object.route}`);
+        }
+      },
       autoHighlight: true,
       transitions: {
         getRadius: {
@@ -145,7 +150,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getWidth: 1,
     }),
   ];
-
   return (
     <Layout defaultColor={defaultColor}>
       <DeckGL
