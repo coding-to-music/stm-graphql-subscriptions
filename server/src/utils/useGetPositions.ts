@@ -15,8 +15,12 @@ const mockData = async () => {
     const id = vehicle.id;
     const tripId = vehicle.tripId;
     const routeId = vehicle.routeId;
-    const latitude = vehicle.position.latitude + Math.random() / 1000;
-    const longitude = vehicle.position.longitude + Math.random() / 1000;
+    const latitude =
+      vehicle.position.latitude +
+      (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
+    const longitude =
+      vehicle.position.longitude +
+      (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
     const vehicleTimestamp = currentTime;
     const vehicleId = vehicle.id;
     return {
