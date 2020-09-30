@@ -28,6 +28,16 @@ const testPath = [
   },
 ];
 
+const positionGenerator = (arr: any) =>
+  arr.map((vehicle: any) => {
+    return {
+      id: vehicle.id,
+      timestamp: vehicle.timestamp,
+      route: vehicle.routeId,
+      position: [vehicle.position.longitude, vehicle.position.latitude],
+    };
+  });
+
 interface MapProps {
   defaultColor: string;
 }
@@ -47,14 +57,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (qdata && !vehicles) {
-      const positions: any = qdata.getpositions.feed?.map((vehicle: any) => {
-        return {
-          id: vehicle.id,
-          timestamp: vehicle.timestamp,
-          route: vehicle.routeId,
-          position: [vehicle.position.longitude, vehicle.position.latitude],
-        };
-      });
+      const positions: any = positionGenerator(qdata.getpositions.feed);
       setVehicles(positions);
       const indexed = positions.reduce((accumulator: any, current: any) => {
         const vehicle = {
@@ -72,29 +75,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   useEffect(() => {
     if (data && data.positions.timestamp) {
       const trips: any = keyed.current;
-      const positions: any = data.positions.feed?.map((vehicle: any) => {
-        return {
-          id: vehicle.id,
-          timestamp: vehicle.timestamp,
-          route: vehicle.routeId,
-          position: [vehicle.position.longitude, vehicle.position.latitude],
-        };
-      });
+      const positions: any = positionGenerator(data.positions.feed);
       setVehicles(positions);
       positions.forEach((entry: any) => {
         if (entry.id in trips) {
+          const prevPositions = trips[entry.id].path;
+          const prevTimestamps = trips[entry.id].timestamp;
           if (
             JSON.stringify(entry.position) !==
-            JSON.stringify(
-              trips[entry.id].path[trips[entry.id].path.length - 1]
-            )
+            JSON.stringify(prevPositions[prevPositions.length - 1])
           ) {
-            if (trips[entry.id].path.length > 1) {
-              trips[entry.id].path.shift();
-              trips[entry.id].timestamp.shift();
+            if (prevPositions.length > 1) {
+              prevPositions.shift();
+              prevTimestamps.shift();
             }
-            trips[entry.id].timestamp.push(entry.timestamp);
-            trips[entry.id].path.push(entry.position);
+            prevTimestamps.push(entry.timestamp);
+            prevPositions.push(entry.position);
             trips[entry.id].updated = true;
           } else {
             trips[entry.id].updated = false;
