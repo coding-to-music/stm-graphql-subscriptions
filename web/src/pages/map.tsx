@@ -48,6 +48,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
 
+  const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
@@ -130,7 +131,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
-      onHover: (info: any) => setHoverInfo(info),
+      onHover: (info: any) => {
+        setHoverInfo(info);
+        if (info.object) {
+          setSelected(info.object.id);
+        } else {
+          setSelected(null);
+        }
+      },
       autoHighlight: true,
       transitions: {
         getRadius: {
