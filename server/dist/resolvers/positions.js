@@ -24,7 +24,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const useGetPositions_1 = require("../utils/useGetPositions");
-const feedParser_1 = require("../utils/feedParser");
 let Position = class Position {
 };
 __decorate([
@@ -113,8 +112,7 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const response = yield useGetPositions_1.useGetPositions();
-                const feed = feedParser_1.feedParser(response);
+                const feed = yield useGetPositions_1.useGetPositions();
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;
@@ -129,8 +127,7 @@ let PositionsResolver = class PositionsResolver {
                 return feed;
             }
             else {
-                const response = yield useGetPositions_1.useGetPositions();
-                const feed = feedParser_1.feedParser(response);
+                const feed = yield useGetPositions_1.useGetPositions();
                 yield ctx.redis.set("positions", JSON.stringify(feed));
                 yield ctx.redis.expire("positions", 10);
                 return feed;

@@ -13,7 +13,38 @@ exports.useGetPositions = void 0;
 const fetch = require("node-fetch");
 const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 const constants_1 = require("../constants");
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () {
+const fs_1 = require("fs");
+const feedParser_1 = require("./feedParser");
+const date = new Date();
+const currentTime = date.getTime() / 1000;
+const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const file = yield fs_1.promises.readFile("./feed.json", "utf-8");
+    const data = JSON.parse(file);
+    data.timestamp = currentTime;
+    const feed = data.feed.map((vehicle) => {
+        const id = vehicle.id;
+        const tripId = vehicle.tripId;
+        const routeId = vehicle.routeId;
+        const latitude = vehicle.position.latitude + Math.random() / 1000;
+        const longitude = vehicle.position.longitude + Math.random() / 1000;
+        const vehicleTimestamp = currentTime;
+        const vehicleId = vehicle.id;
+        return {
+            id: id,
+            tripId: tripId,
+            routeId: routeId,
+            position: {
+                latitude: latitude,
+                longitude: longitude,
+            },
+            timestamp: vehicleTimestamp,
+            vehicleId: vehicleId,
+        };
+    });
+    data.feed = feed;
+    return data;
+});
+const ApiFetch = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
         method: "POST",
         mode: "no-cors",
@@ -29,6 +60,7 @@ exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     const buffer = yield response.buffer();
     const feed = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
-    return feed;
+    return feedParser_1.feedParser(feed);
 });
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield mockData(); });
 //# sourceMappingURL=useGetPositions.js.map

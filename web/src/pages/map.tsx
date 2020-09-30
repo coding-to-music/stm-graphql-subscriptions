@@ -119,6 +119,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (selected) {
+      console.log(selected);
+    }
+  }, [selected]);
+
   const layers = [
     new ScatterplotLayer({
       id: "scatterplot-layer",

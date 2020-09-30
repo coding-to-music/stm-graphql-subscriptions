@@ -34,7 +34,6 @@ const createUserLoader_1 = require("./utils/createUserLoader");
 const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 const positions_1 = require("./resolvers/positions");
 const useGetPositions_1 = require("./utils/useGetPositions");
-const feedParser_1 = require("./utils/feedParser");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -134,8 +133,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         const subscribers = yield redis.get("subscribers");
         if (subscribers > 0) {
-            const response = yield useGetPositions_1.useGetPositions();
-            const feed = feedParser_1.feedParser(response);
+            const feed = yield useGetPositions_1.useGetPositions();
             const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
             console.log(`${feed.count} vehicles, ${currentTime}`);
             yield redis.set("positions", JSON.stringify(feed));

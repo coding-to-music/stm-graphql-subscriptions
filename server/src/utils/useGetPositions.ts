@@ -1,8 +1,41 @@
 const fetch = require("node-fetch");
 const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 import { APIKEY } from "../constants";
+import { promises as fs } from "fs";
+import { feedParser } from "./feedParser";
 
-export const useGetPositions = async () => {
+const date = new Date();
+const currentTime = date.getTime() / 1000;
+
+const mockData = async () => {
+  const file = await fs.readFile("./feed.json", "utf-8");
+  const data = JSON.parse(file);
+  data.timestamp = currentTime;
+  const feed = data.feed.map((vehicle: any) => {
+    const id = vehicle.id;
+    const tripId = vehicle.tripId;
+    const routeId = vehicle.routeId;
+    const latitude = vehicle.position.latitude + Math.random() / 1000;
+    const longitude = vehicle.position.longitude + Math.random() / 1000;
+    const vehicleTimestamp = currentTime;
+    const vehicleId = vehicle.id;
+    return {
+      id: id,
+      tripId: tripId,
+      routeId: routeId,
+      position: {
+        latitude: latitude,
+        longitude: longitude,
+      },
+      timestamp: vehicleTimestamp,
+      vehicleId: vehicleId,
+    };
+  });
+  data.feed = feed;
+  return data;
+};
+
+const ApiFetch = async () => {
   const response = await fetch(
     "https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions",
     {
@@ -23,5 +56,7 @@ export const useGetPositions = async () => {
   const feed = await GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
     buffer
   );
-  return feed;
+  return feedParser(feed);
 };
+
+export const useGetPositions = async () => await mockData();
