@@ -39,7 +39,7 @@ const mockData = async () => {
   return data;
 };
 
-const ApiFetch = async () => {
+const liveData = async () => {
   const response = await fetch(
     "https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions",
     {
@@ -63,4 +63,4 @@ const ApiFetch = async () => {
   return feedParser(feed);
 };
 
-export const useGetPositions = async () => await mockData();
+export const useGetPositions = async () => await liveData();

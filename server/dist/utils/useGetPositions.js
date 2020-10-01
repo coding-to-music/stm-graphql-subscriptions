@@ -46,7 +46,7 @@ const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
     data.feed = feed;
     return data;
 });
-const ApiFetch = () => __awaiter(void 0, void 0, void 0, function* () {
+const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
         method: "POST",
         mode: "no-cors",
@@ -64,5 +64,5 @@ const ApiFetch = () => __awaiter(void 0, void 0, void 0, function* () {
     const feed = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
     return feedParser_1.feedParser(feed);
 });
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield mockData(); });
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
 //# sourceMappingURL=useGetPositions.js.map

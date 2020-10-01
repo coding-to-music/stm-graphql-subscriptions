@@ -13,8 +13,8 @@ exports.feedParser = (response) => {
         const routeId = entity.vehicle.trip.routeId;
         const latitude = entity.vehicle.position.latitude;
         const longitude = entity.vehicle.position.longitude;
-        const currentStopSequence = entity.vehicle.trip.currentStopSequence;
-        const currentStatus = entity.vehicle.trip.currentStatus;
+        const currentStopSequence = entity.vehicle.currentStopSequence;
+        const currentStatus = entity.vehicle.currentStatus;
         const vehicleTimestamp = entity.vehicle.timestamp.low;
         const vehicleId = entity.vehicle.vehicle.id;
         return {
