@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useGetPositions = void 0;
 const fetch = require("node-fetch");
@@ -15,8 +18,10 @@ const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 const constants_1 = require("../constants");
 const fs_1 = require("fs");
 const feedParser_1 = require("./feedParser");
+const ioredis_1 = __importDefault(require("ioredis"));
 const date = new Date();
 const currentTime = date.getTime() / 1000;
+const redis = new ioredis_1.default();
 const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
     const file = yield fs_1.promises.readFile("./feed.json", "utf-8");
     const data = JSON.parse(file);
@@ -61,8 +66,16 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     const buffer = yield response.buffer();
-    const feed = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
-    return feedParser_1.feedParser(feed);
+    const bufferHeader = buffer.toString().slice(0, 23);
+    if (bufferHeader === "API plan limit exceeded") {
+        console.log(bufferHeader);
+        const prevFeed = yield redis.get("prevFeed");
+        return JSON.parse(prevFeed);
+    }
+    const raw = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
+    const feed = feedParser_1.feedParser(raw);
+    yield redis.set("prevFeed", JSON.stringify(feed));
+    return feed;
 });
 exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
 //# sourceMappingURL=useGetPositions.js.map

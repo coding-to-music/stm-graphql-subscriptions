@@ -3,9 +3,12 @@ const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 import { APIKEY } from "../constants";
 import { promises as fs } from "fs";
 import { feedParser } from "./feedParser";
+import Redis from "ioredis";
 
 const date = new Date();
 const currentTime = date.getTime() / 1000;
+
+const redis = new Redis();
 
 const mockData = async () => {
   const file = await fs.readFile("./feed.json", "utf-8");
@@ -57,10 +60,18 @@ const liveData = async () => {
     }
   );
   const buffer = await response.buffer();
-  const feed = await GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+  const bufferHeader = buffer.toString().slice(0, 23);
+  if (bufferHeader === "API plan limit exceeded") {
+    console.log(bufferHeader);
+    const prevFeed: any = await redis.get("prevFeed");
+    return JSON.parse(prevFeed);
+  }
+  const raw = await GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
     buffer
   );
-  return feedParser(feed);
+  const feed = feedParser(raw);
+  await redis.set("prevFeed", JSON.stringify(feed));
+  return feed;
 };
 
 export const useGetPositions = async () => await liveData();

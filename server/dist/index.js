@@ -137,10 +137,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
             console.log(`${feed.count} vehicles, ${currentTime}`);
             yield redis.set("positions", JSON.stringify(feed));
-            yield redis.expire("positions", 10);
+            yield redis.expire("positions", 11);
             pubsub.publish("POSITIONS", null);
         }
-    }), 10000);
+    }), 11000);
 });
 main().catch((error) => {
     console.error(error);

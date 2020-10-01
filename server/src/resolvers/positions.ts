@@ -7,7 +7,6 @@ import {
   Field,
 } from "type-graphql";
 import { useGetPositions } from "../utils/useGetPositions";
-import { feedParser } from "../utils/feedParser";
 
 @ObjectType()
 class Position {
@@ -63,9 +62,8 @@ export class PositionsResolver {
       return feed;
     } else {
       const feed = await useGetPositions();
-      // const feed = feedParser(response);
       await ctx.redis.set("positions", JSON.stringify(feed));
-      await ctx.redis.expire("positions", 10);
+      await ctx.redis.expire("positions", 11);
       return feed;
     }
   }
@@ -80,9 +78,8 @@ export class PositionsResolver {
       return feed;
     } else {
       const feed = await useGetPositions();
-      // const feed = feedParser(response);
       await ctx.redis.set("positions", JSON.stringify(feed));
-      await ctx.redis.expire("positions", 10);
+      await ctx.redis.expire("positions", 11);
       return feed;
     }
   }

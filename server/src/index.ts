@@ -27,7 +27,6 @@ import { createUserLoader } from "./utils/createUserLoader";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
-import { feedParser } from "./utils/feedParser";
 
 const main = async () => {
   const conn = await createConnection({
@@ -146,10 +145,10 @@ const main = async () => {
       const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
       console.log(`${feed.count} vehicles, ${currentTime}`);
       await redis.set("positions", JSON.stringify(feed));
-      await redis.expire("positions", 10);
+      await redis.expire("positions", 11);
       pubsub.publish("POSITIONS", null);
     }
-  }, 10000);
+  }, 11000);
 };
 
 main().catch((error) => {

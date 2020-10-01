@@ -114,7 +114,7 @@ let PositionsResolver = class PositionsResolver {
             else {
                 const feed = yield useGetPositions_1.useGetPositions();
                 yield ctx.redis.set("positions", JSON.stringify(feed));
-                yield ctx.redis.expire("positions", 10);
+                yield ctx.redis.expire("positions", 11);
                 return feed;
             }
         });
@@ -129,7 +129,7 @@ let PositionsResolver = class PositionsResolver {
             else {
                 const feed = yield useGetPositions_1.useGetPositions();
                 yield ctx.redis.set("positions", JSON.stringify(feed));
-                yield ctx.redis.expire("positions", 10);
+                yield ctx.redis.expire("positions", 11);
                 return feed;
             }
         });
