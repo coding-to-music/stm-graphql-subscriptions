@@ -6,7 +6,7 @@ import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
-import { Box, useColorMode } from "@chakra-ui/core";
+import { Box, DarkMode, useColorMode } from "@chakra-ui/core";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -124,9 +124,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       radiusMinPixels: 1,
       radiusMaxPixels: 5,
       getRadius: 25,
+      getPosition: (d: any) => d.position,
       getFillColor: (d: any) =>
-        d.route === selected ? [255, 99, 71] : [0, 173, 230],
-      // keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
+        // d.route === selected ? [255, 99, 71] : [0, 173, 230],
+        keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
       onHover: (info: any) => {
@@ -151,7 +152,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       pickable: true,
       widthScale: 5,
       widthMinPixels: 1,
-      getPath: (d: any) => (d.route === selected ? d.path : d.path.slice(-1)),
+      // getPath: (d: any) => (d.route === selected ? d.path : d.path.slice(-1)),
+      getPath: (d: any) => d.path,
       getColor: [0, 173, 230],
       getWidth: 1,
     }),
@@ -164,7 +166,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         layers={layers}
       >
         <StaticMap
-          mapStyle={"mapbox://styles/mappingmtl/ck87roalx0h3n1jp72b1hgun4"}
+          // mapStyle={
+          //   colorMode === "dark"
+          //     ? "mapbox://styles/mappingmtl/ck87roalx0h3n1jp72b1hgun4"
+          //     : "mapbox://styles/mappingmtl/ck96f2n00061e1io8c6q5z9im"
+          // }
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
           width={"100vw"}
           height={"100vh"}
