@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
-import { StaticMap } from "react-map-gl";
+import { StaticMap, FlyToInterpolator } from "react-map-gl";
 import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
@@ -49,10 +49,39 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
 
+  const monochrome =
+    colorMode === "dark"
+      ? "mapbox://styles/mapbox/dark-v10"
+      : "mapbox://styles/mapbox/light-v10";
+  const [mapStyle, setMapStyle] = useState(monochrome);
   const [mapMode, setMapMode] = useState("monochrome");
   const handleSetMapMode = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setMapMode(value);
+    switch (value) {
+      case "monochrome":
+        setMapStyle(monochrome);
+        break;
+      case "streets":
+        setMapStyle("mapbox://styles/mapbox/streets-v11");
+        break;
+      case "satellite":
+        setMapStyle("mapbox://styles/mapbox/satellite-streets-v11");
+        break;
+      default:
+        setMapStyle(monochrome);
+    }
+  };
+
+  const [viewState, setViewState] = useState(initialViewState);
+  const handleChangeViewState = ({ viewState }) => setViewState(viewState);
+  const handleFlyTo = () => {
+    setViewState({
+      ...viewState,
+      ...initialViewState,
+      transitionDuration: 500,
+      transitionInterpolator: new FlyToInterpolator(),
+    });
   };
 
   const [selected, setSelected] = useState();
@@ -68,6 +97,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     data: qdata,
     // loading: qloading, error: qerror,
   } = useGetPositionsQuery({});
+
+  useEffect(() => {
+    if (mapMode === "monochrome") {
+      setMapStyle(monochrome);
+    }
+  }, [colorMode]);
 
   useEffect(() => {
     if (qdata && !vehicles) {
@@ -190,15 +225,13 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     <Layout defaultColor={defaultColor}>
       <DeckGL
         initialViewState={initialViewState}
+        viewState={viewState}
+        onViewStateChange={handleChangeViewState}
         controller={true}
         layers={layers}
       >
         <StaticMap
-          mapStyle={
-            colorMode === "dark"
-              ? "mapbox://styles/mapbox/dark-v10"
-              : "mapbox://styles/mapbox/light-v10"
-          }
+          mapStyle={mapStyle}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
           width={"100vw"}
           height={"100vh"}
@@ -224,6 +257,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         defaultColor={defaultColor}
         mapMode={mapMode}
         handleSetMapMode={handleSetMapMode}
+        handleFlyTo={handleFlyTo}
       />
     </Layout>
   );

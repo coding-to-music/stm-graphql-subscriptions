@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import { Box, useColorMode, Button, Radio, RadioGroup } from "@chakra-ui/core";
 
-// mapbox://styles/mapbox/streets-v11
-// mapbox://styles/mapbox/satellite-streets-v11
-
 interface MapControlsProps {
   defaultColor: string;
   mapMode: string;
   handleSetMapMode: any;
+  handleFlyTo: any;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
   defaultColor,
   mapMode,
   handleSetMapMode,
+  handleFlyTo,
 }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -40,7 +39,9 @@ const MapControls: React.FC<MapControlsProps> = ({
         </RadioGroup>
       </Box>
       <Box p={1}>
-        <Button variantColor={defaultColor}>Zoom Out</Button>
+        <Button onClick={() => handleFlyTo()} variantColor={defaultColor}>
+          Zoom Out
+        </Button>
       </Box>
     </Box>
   );
