@@ -85,5 +85,5 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`${currentTime} live data: ${feed.count} vehicles, ${timestamp}`);
     return feed;
 });
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield mockData(); });
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
 //# sourceMappingURL=useGetPositions.js.map

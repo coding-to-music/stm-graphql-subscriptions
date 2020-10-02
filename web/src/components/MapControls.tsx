@@ -29,6 +29,8 @@ const MapControls: React.FC<MapControlsProps> = ({
       bg={bgColor[colorMode]}
       color={color[colorMode]}
       p={1}
+      borderWidth="2px"
+      rounded="lg"
     >
       <Box p={1}>Map Style</Box>
       <Box p={1}>
@@ -40,7 +42,7 @@ const MapControls: React.FC<MapControlsProps> = ({
       </Box>
       <Box p={1}>
         <Button onClick={() => handleFlyTo()} variantColor={defaultColor}>
-          Zoom Out
+          Reset View
         </Button>
       </Box>
     </Box>

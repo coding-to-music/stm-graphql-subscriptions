@@ -83,4 +83,4 @@ const liveData = async () => {
   return feed;
 };
 
-export const useGetPositions = async () => await mockData();
+export const useGetPositions = async () => await liveData();
