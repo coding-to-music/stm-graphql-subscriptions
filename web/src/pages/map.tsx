@@ -48,7 +48,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
 
-  const [selected, setSelected] = useState("80");
+  const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
@@ -87,6 +87,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       setVehicles(positions);
       positions.forEach((entry: any) => {
         const id = entry.id;
+        const route = entry.route;
         const timestamp = entry.timestamp;
         const position = entry.position;
         if (id in trips) {
@@ -104,6 +105,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         } else {
           trips[id] = {
             id: id,
+            route: route,
             timestamp: [timestamp],
             path: [position],
             updated: true,
@@ -114,7 +116,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const tripValues: any = Object.values(trips);
       setPaths(tripValues);
     }
-  }, [data]);
+  }, [data, selected]);
 
   const layers = [
     new ScatterplotLayer({
@@ -125,15 +127,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       radiusMaxPixels: 5,
       getRadius: 25,
       getPosition: (d: any) => d.position,
-      getFillColor: (d: any) =>
-        // d.route === selected ? [255, 99, 71] : [0, 173, 230],
-        keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
+      getFillColor: (d: any) => {
+        if (d.route === selected) {
+          return [255, 99, 71];
+        } else {
+          return [0, 173, 230];
+        }
+      },
+      // keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
-      onClick: ({ object }: any) => console.log(`Route ${object.route}`),
+      onClick: ({ object }: any) => {
+        console.log(`Route ${object.route}`);
+      },
       onHover: (info: any) => {
         setHoverInfo(info);
         if (info.object) {
-          setSelected(info.object.id);
+          setSelected(info.object.route);
         } else {
           setSelected(null);
         }
@@ -152,9 +161,20 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       pickable: true,
       widthScale: 5,
       widthMinPixels: 1,
-      // getPath: (d: any) => (d.route === selected ? d.path : d.path.slice(-1)),
-      getPath: (d: any) => d.path,
-      getColor: [0, 173, 230],
+      getPath: (d: any) => {
+        if (d.route === selected) {
+          return d.path;
+        } else {
+          return d.path.slice(-3);
+        }
+      },
+      getColor: (d: any) => {
+        if (d.route === selected) {
+          return [255, 99, 71];
+        } else {
+          return [0, 173, 230];
+        }
+      },
       getWidth: 1,
     }),
   ];
@@ -166,11 +186,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         layers={layers}
       >
         <StaticMap
-          // mapStyle={
-          //   colorMode === "dark"
-          //     ? "mapbox://styles/mappingmtl/ck87roalx0h3n1jp72b1hgun4"
-          //     : "mapbox://styles/mappingmtl/ck96f2n00061e1io8c6q5z9im"
-          // }
+          mapStyle={
+            colorMode === "dark"
+              ? "mapbox://styles/mapbox/dark-v10"
+              : "mapbox://styles/mapbox/light-v10"
+          }
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
           width={"100vw"}
           height={"100vh"}
