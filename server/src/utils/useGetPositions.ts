@@ -5,12 +5,9 @@ import { promises as fs } from "fs";
 import { feedParser } from "./feedParser";
 import Redis from "ioredis";
 
-const date = new Date();
-const currentTime = date.getTime() / 1000;
-
-const redis = new Redis();
-
 const mockData = async () => {
+  const date = new Date();
+  const currentTime = date.getTime() / 1000;
   const file = await fs.readFile("./feed.json", "utf-8");
   const data = JSON.parse(file);
   data.timestamp = currentTime;
@@ -41,6 +38,8 @@ const mockData = async () => {
   data.feed = feed;
   return data;
 };
+
+const redis = new Redis();
 
 const liveData = async () => {
   const response = await fetch(
@@ -74,4 +73,4 @@ const liveData = async () => {
   return feed;
 };
 
-export const useGetPositions = async () => await liveData();
+export const useGetPositions = async () => await mockData();

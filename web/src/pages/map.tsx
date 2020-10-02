@@ -48,7 +48,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
 
-  const [selected, setSelected] = useState();
+  const [selected, setSelected] = useState("80");
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
@@ -69,6 +69,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const indexed = positions.reduce((accumulator: any, current: any) => {
         const vehicle = {
           id: current.id,
+          route: current.route,
           timestamp: [current.timestamp],
           path: [current.position],
           updated: false,
@@ -94,10 +95,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           const lastPosition = prevPositions[prevPositions.length - 1];
           const prevTimestamps = trip.timestamp;
           if (JSON.stringify(position) !== JSON.stringify(lastPosition)) {
-            // if (prevPositions.length > 1) {
-            //   prevPositions.shift();
-            //   prevTimestamps.shift();
-            // }
             prevTimestamps.push(timestamp);
             prevPositions.push(position);
             trip.updated = true;
@@ -119,12 +116,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (selected) {
-      console.log(selected);
-    }
-  }, [selected]);
-
   const layers = [
     new ScatterplotLayer({
       id: "scatterplot-layer",
@@ -134,7 +125,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       radiusMaxPixels: 5,
       getRadius: 25,
       getFillColor: (d: any) =>
-        keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
+        d.route === selected ? [255, 99, 71] : [0, 173, 230],
+      // keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => console.log(`Route ${object.route}`),
       onHover: (info: any) => {
@@ -159,7 +151,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       pickable: true,
       widthScale: 5,
       widthMinPixels: 1,
-      getPath: (d: any) => d.path.slice(-3),
+      getPath: (d: any) => (d.route === selected ? d.path : d.path.slice(-1)),
       getColor: [0, 173, 230],
       getWidth: 1,
     }),

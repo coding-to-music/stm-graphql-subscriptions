@@ -19,10 +19,9 @@ const constants_1 = require("../constants");
 const fs_1 = require("fs");
 const feedParser_1 = require("./feedParser");
 const ioredis_1 = __importDefault(require("ioredis"));
-const date = new Date();
-const currentTime = date.getTime() / 1000;
-const redis = new ioredis_1.default();
 const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const date = new Date();
+    const currentTime = date.getTime() / 1000;
     const file = yield fs_1.promises.readFile("./feed.json", "utf-8");
     const data = JSON.parse(file);
     data.timestamp = currentTime;
@@ -51,6 +50,7 @@ const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
     data.feed = feed;
     return data;
 });
+const redis = new ioredis_1.default();
 const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
         method: "POST",
@@ -77,5 +77,5 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     yield redis.set("prevFeed", JSON.stringify(feed));
     return feed;
 });
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield mockData(); });
 //# sourceMappingURL=useGetPositions.js.map
