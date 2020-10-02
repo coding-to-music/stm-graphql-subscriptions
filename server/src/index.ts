@@ -142,8 +142,6 @@ const main = async () => {
     const subscribers = await redis.get("subscribers");
     if (subscribers > 0) {
       const feed = await useGetPositions();
-      const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
-      console.log(`${feed.count} vehicles, ${currentTime}`);
       await redis.set("positions", JSON.stringify(feed));
       await redis.expire("positions", 11);
       pubsub.publish("POSITIONS", null);

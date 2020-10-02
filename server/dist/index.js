@@ -134,8 +134,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         const subscribers = yield redis.get("subscribers");
         if (subscribers > 0) {
             const feed = yield useGetPositions_1.useGetPositions();
-            const currentTime = new Date(feed.timestamp * 1000).toLocaleTimeString();
-            console.log(`${feed.count} vehicles, ${currentTime}`);
             yield redis.set("positions", JSON.stringify(feed));
             yield redis.expire("positions", 11);
             pubsub.publish("POSITIONS", null);

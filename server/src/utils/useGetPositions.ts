@@ -36,12 +36,15 @@ const mockData = async () => {
     };
   });
   data.feed = feed;
+  const time = date.toLocaleTimeString();
+  console.log(`mock data: ${data.count} vehicles, ${time}`);
   return data;
 };
 
 const redis = new Redis();
 
 const liveData = async () => {
+  const currentTime = new Date().toLocaleTimeString();
   const response = await fetch(
     "https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions",
     {
@@ -61,16 +64,23 @@ const liveData = async () => {
   const buffer = await response.buffer();
   const bufferHeader = buffer.toString().slice(0, 23);
   if (bufferHeader === "API plan limit exceeded") {
-    console.log(bufferHeader);
-    const prevFeed: any = await redis.get("prevFeed");
-    return JSON.parse(prevFeed);
+    console.log(`${bufferHeader}`);
+    const json: any = await redis.get("prevFeed");
+    const prevFeed = JSON.parse(json);
+    const timestamp = new Date(prevFeed.timestamp * 1000).toLocaleTimeString();
+    console.log(
+      `${currentTime} cached data: ${prevFeed.count} vehicles, ${timestamp}`
+    );
+    return prevFeed;
   }
   const raw = await GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
     buffer
   );
   const feed = feedParser(raw);
   await redis.set("prevFeed", JSON.stringify(feed));
+  const timestamp = new Date(feed.timestamp * 1000).toLocaleTimeString();
+  console.log(`${currentTime} live data: ${feed.count} vehicles, ${timestamp}`);
   return feed;
 };
 
-export const useGetPositions = async () => await mockData();
+export const useGetPositions = async () => await liveData();

@@ -48,10 +48,13 @@ const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
         };
     });
     data.feed = feed;
+    const time = date.toLocaleTimeString();
+    console.log(`mock data: ${data.count} vehicles, ${time}`);
     return data;
 });
 const redis = new ioredis_1.default();
 const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const currentTime = new Date().toLocaleTimeString();
     const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
         method: "POST",
         mode: "no-cors",
@@ -68,14 +71,19 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     const buffer = yield response.buffer();
     const bufferHeader = buffer.toString().slice(0, 23);
     if (bufferHeader === "API plan limit exceeded") {
-        console.log(bufferHeader);
-        const prevFeed = yield redis.get("prevFeed");
-        return JSON.parse(prevFeed);
+        console.log(`${bufferHeader}`);
+        const json = yield redis.get("prevFeed");
+        const prevFeed = JSON.parse(json);
+        const timestamp = new Date(prevFeed.timestamp * 1000).toLocaleTimeString();
+        console.log(`${currentTime} cached data: ${prevFeed.count} vehicles, ${timestamp}`);
+        return prevFeed;
     }
     const raw = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
     const feed = feedParser_1.feedParser(raw);
     yield redis.set("prevFeed", JSON.stringify(feed));
+    const timestamp = new Date(feed.timestamp * 1000).toLocaleTimeString();
+    console.log(`${currentTime} live data: ${feed.count} vehicles, ${timestamp}`);
     return feed;
 });
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield mockData(); });
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
 //# sourceMappingURL=useGetPositions.js.map
