@@ -6,7 +6,8 @@ import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
-import { Box, DarkMode, useColorMode } from "@chakra-ui/core";
+import { Box, useColorMode } from "@chakra-ui/core";
+import MapControls from "../components/MapControls";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -131,10 +132,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         if (d.route === selected) {
           return [255, 99, 71];
         } else {
-          return [0, 173, 230];
+          return keyed.current[d.id].updated === true
+            ? [255, 99, 71]
+            : [0, 173, 230];
         }
       },
-      // keyed.current[d.id].updated === true ? [255, 99, 71] : [0, 173, 230],
       pickable: true,
       onClick: ({ object }: any) => {
         console.log(`Route ${object.route}`);
@@ -212,6 +214,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           </Box>
         ) : null}
       </DeckGL>
+      <MapControls defaultColor={defaultColor} />
     </Layout>
   );
 };
