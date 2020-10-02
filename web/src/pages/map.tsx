@@ -49,6 +49,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
 
+  const [mapMode, setMapMode] = useState("monochrome");
+  const handleSetMapMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setMapMode(value);
+  };
+
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
@@ -214,7 +220,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           </Box>
         ) : null}
       </DeckGL>
-      <MapControls defaultColor={defaultColor} />
+      <MapControls
+        defaultColor={defaultColor}
+        mapMode={mapMode}
+        handleSetMapMode={handleSetMapMode}
+      />
     </Layout>
   );
 };
