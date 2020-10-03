@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   useColorMode,
@@ -8,6 +8,7 @@ import {
   IconButton,
   Flex,
   Text,
+  Collapse,
 } from "@chakra-ui/core";
 
 interface MapControlsProps {
@@ -28,6 +29,8 @@ const MapControls: React.FC<MapControlsProps> = ({
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const color = { light: "black", dark: "white" };
+  const [show, setShow] = useState(false);
+  const handleToggle = () => setShow(!show);
 
   return (
     <Box
@@ -82,6 +85,21 @@ const MapControls: React.FC<MapControlsProps> = ({
           <Text>Rotate</Text>
         </Box>
       </Flex>
+      <Flex justifyContent="flex-end" alignItems="center">
+        <Box>{!show ? "More" : "Hide"}</Box>
+        <IconButton
+          aria-label={!show ? "more" : "hide"}
+          icon={!show ? "triangle-down" : "triangle-up"}
+          variant="link"
+          variantColor={defaultColor}
+          onClick={handleToggle}
+        />
+      </Flex>
+      <Collapse mt={4} isOpen={show}>
+        <Box>Setting 1</Box>
+        <Box>Setting 2</Box>
+        <Box>Setting 3</Box>
+      </Collapse>
     </Box>
   );
 };
