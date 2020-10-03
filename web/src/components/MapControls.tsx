@@ -1,11 +1,21 @@
-import React, { useState } from "react";
-import { Box, useColorMode, Button, Radio, RadioGroup } from "@chakra-ui/core";
+import React from "react";
+import {
+  Box,
+  useColorMode,
+  Button,
+  Radio,
+  RadioGroup,
+  IconButton,
+  Flex,
+  Text,
+} from "@chakra-ui/core";
 
 interface MapControlsProps {
   defaultColor: string;
   mapMode: string;
   handleSetMapMode: any;
   handleFlyTo: any;
+  handleOrient: any;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -13,6 +23,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   mapMode,
   handleSetMapMode,
   handleFlyTo,
+  handleOrient,
 }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -40,11 +51,32 @@ const MapControls: React.FC<MapControlsProps> = ({
           <Radio value="satellite">Satellite</Radio>
         </RadioGroup>
       </Box>
-      <Box p={1}>
-        <Button onClick={() => handleFlyTo()} variantColor={defaultColor}>
-          Reset View
-        </Button>
-      </Box>
+      <Flex p={1}>
+        <Box p={1}>
+          <IconButton
+            aria-label="reset zoom"
+            icon="search"
+            onClick={() => handleFlyTo()}
+            variantColor={defaultColor}
+          />
+        </Box>
+        <Box p={1}>
+          <IconButton
+            aria-label="orientation"
+            icon="repeat"
+            onClick={() => handleOrient()}
+            variantColor={defaultColor}
+          />
+        </Box>
+      </Flex>
+      <Flex>
+        <Box p={1}>
+          <Text>Reset</Text>
+        </Box>
+        <Box p={1}>
+          <Text>Rotate</Text>
+        </Box>
+      </Flex>
     </Box>
   );
 };

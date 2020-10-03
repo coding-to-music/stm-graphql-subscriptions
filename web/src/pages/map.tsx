@@ -83,6 +83,16 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       transitionInterpolator: new FlyToInterpolator(),
     });
   };
+  // {longitude: -73.645, latitude: 45.56, zoom: 11, pitch: 0, bearing: -57.5}
+  const handleOrient = () => {
+    setViewState((prev) => {
+      return {
+        ...prev,
+        bearing: prev.bearing !== 0 ? 0 : -57.5,
+        transitionDuration: 500,
+      };
+    });
+  };
 
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
@@ -258,6 +268,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         mapMode={mapMode}
         handleSetMapMode={handleSetMapMode}
         handleFlyTo={handleFlyTo}
+        handleOrient={handleOrient}
       />
     </Layout>
   );
