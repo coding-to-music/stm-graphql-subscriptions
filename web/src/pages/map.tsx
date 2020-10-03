@@ -74,7 +74,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   };
 
   const [viewState, setViewState] = useState(initialViewState);
-  const handleChangeViewState = ({ viewState }) => setViewState(viewState);
+  const handleChangeViewState = ({ viewState }: any) => setViewState(viewState);
   const handleFlyTo = () => {
     setViewState({
       ...viewState,

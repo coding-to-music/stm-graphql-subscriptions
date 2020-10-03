@@ -46,7 +46,12 @@ const MapControls: React.FC<MapControlsProps> = ({
       <Box p={1}>Map Style</Box>
       <Box p={1}>
         <RadioGroup onChange={handleSetMapMode} value={mapMode}>
-          <Radio value="monochrome">Monochrome</Radio>
+          <Radio display={["flex", "none", "none", "none"]} value="monochrome">
+            Mono
+          </Radio>
+          <Radio display={["none", "flex", "flex", "flex"]} value="monochrome">
+            Monochrome
+          </Radio>
           <Radio value="streets">Streets</Radio>
           <Radio value="satellite">Satellite</Radio>
         </RadioGroup>
