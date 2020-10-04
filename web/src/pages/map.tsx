@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap, FlyToInterpolator } from "react-map-gl";
-import { DeckGL, ScatterplotLayer, PathLayer } from "deck.gl";
+import { DeckGL, ScatterplotLayer, PathLayer, GeoJsonLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
 import { Box, useColorMode } from "@chakra-ui/core";
 import MapControls from "../components/MapControls";
+import routes from "../data/routes.json";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -212,6 +213,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       id: "path-layer",
       data: paths,
       pickable: true,
+      autoHighlight: true,
       widthScale: 5,
       widthMinPixels: 1,
       getPath: (d: any) => {
@@ -229,6 +231,16 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         }
       },
       getWidth: 1,
+    }),
+    new GeoJsonLayer({
+      id: "geojson-layer",
+      data: routes,
+      pickable: true,
+      autoHighlight: true,
+      lineWidthScale: 20,
+      lineWidthMinPixels: 2,
+      getLineColor: [160, 160, 180],
+      getLineWidth: 1,
     }),
   ];
   return (
