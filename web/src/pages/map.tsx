@@ -182,14 +182,18 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getLineColor: [160, 160, 180],
       getLineWidth: 1,
       getElevation: 10,
+      onHover: (info: any) => {
+        setHoverInfo(info);
+      },
     }),
     new PathLayer({
       id: "path-layer",
       data: paths,
       pickable: true,
       autoHighlight: true,
-      widthScale: 5,
-      widthMinPixels: 1,
+      widthScale: 2,
+      widthMinPixels: 4,
+      widthMaxPixels: 8,
       getPath: (d: any) => {
         if (d.route === selected) {
           return d.path;
@@ -210,8 +214,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       id: "scatterplot-layer",
       data: vehicles,
       radiusScale: 2,
-      radiusMinPixels: 1,
-      radiusMaxPixels: 5,
+      radiusMinPixels: 4,
+      radiusMaxPixels: 8,
       getRadius: 25,
       getPosition: (d: any) => d.position,
       getFillColor: (d: any) => {
@@ -272,7 +276,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
             color={color[colorMode]}
             p={1}
           >
-            <Box>{`Route ${hoverInfo?.object.route}`}</Box>
+            <Box>{`Route ${
+              hoverInfo?.object.route || hoverInfo?.object.properties.route_id
+            }`}</Box>
           </Box>
         ) : null}
       </DeckGL>
