@@ -262,7 +262,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   return (
     <Layout defaultColor={defaultColor}>
       <DeckGL
-        initialViewState={initialViewState}
         viewState={viewState}
         onViewStateChange={handleChangeViewState}
         controller={true}
