@@ -84,17 +84,25 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       transitionInterpolator: new FlyToInterpolator(),
     });
   };
-  // {longitude: -73.645, latitude: 45.56, zoom: 11, pitch: 0, bearing: -57.5}
   const handleOrient = () => {
     setViewState((prev) => {
       return {
         ...prev,
         bearing: prev.bearing !== 0 ? 0 : -57.5,
         transitionDuration: 500,
-      };
+      }; // const value = event.target.value;
     });
   };
 
+  const [visibleLayers, setVisibleLayers] = useState({
+    routes: false,
+    paths: true,
+    vehicles: true,
+  });
+  const handleSetVisibleLayers = (event: any) => {
+    const value = event.target.value;
+    setVisibleLayers((prev) => ({ ...prev, [value]: !prev[value] }));
+  };
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
@@ -169,12 +177,13 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const tripValues: any = Object.values(trips);
       setPaths(tripValues);
     }
-  }, [data, selected]);
+  }, [data, selected, visibleLayers]);
 
   const layers = [
     new GeoJsonLayer({
       id: "geojson-layer",
       data: routes,
+      visible: visibleLayers.routes,
       pickable: true,
       autoHighlight: true,
       lineWidthScale: 20,
@@ -189,6 +198,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     new PathLayer({
       id: "path-layer",
       data: paths,
+      visible: visibleLayers.paths,
       pickable: true,
       autoHighlight: true,
       widthScale: 2,
@@ -213,6 +223,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     new ScatterplotLayer({
       id: "scatterplot-layer",
       data: vehicles,
+      visible: visibleLayers.vehicles,
       radiusScale: 2,
       radiusMinPixels: 4,
       radiusMaxPixels: 8,
@@ -288,6 +299,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         handleSetMapMode={handleSetMapMode}
         handleFlyTo={handleFlyTo}
         handleOrient={handleOrient}
+        visibleLayers={visibleLayers}
+        handleSetVisibleLayers={handleSetVisibleLayers}
       />
     </Layout>
   );

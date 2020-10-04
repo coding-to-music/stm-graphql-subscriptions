@@ -9,6 +9,7 @@ import {
   Flex,
   Text,
   Collapse,
+  Checkbox,
 } from "@chakra-ui/core";
 
 interface MapControlsProps {
@@ -17,6 +18,8 @@ interface MapControlsProps {
   handleSetMapMode: any;
   handleFlyTo: any;
   handleOrient: any;
+  visibleLayers: any;
+  handleSetVisibleLayers: any;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -25,6 +28,8 @@ const MapControls: React.FC<MapControlsProps> = ({
   handleSetMapMode,
   handleFlyTo,
   handleOrient,
+  visibleLayers,
+  handleSetVisibleLayers,
 }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -95,10 +100,34 @@ const MapControls: React.FC<MapControlsProps> = ({
           onClick={handleToggle}
         />
       </Flex>
-      <Collapse mt={4} isOpen={show}>
-        <Box>Setting 1</Box>
-        <Box>Setting 2</Box>
-        <Box>Setting 3</Box>
+      <Collapse mt={1} isOpen={show}>
+        <Box>Layers</Box>
+        <Flex direction="column">
+          <Checkbox
+            value="vehicles"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.vehicles}
+            onChange={handleSetVisibleLayers}
+          >
+            Vehicles
+          </Checkbox>
+          <Checkbox
+            value="paths"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.paths}
+            onChange={handleSetVisibleLayers}
+          >
+            Paths
+          </Checkbox>
+          <Checkbox
+            value="routes"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.routes}
+            onChange={handleSetVisibleLayers}
+          >
+            Routes
+          </Checkbox>
+        </Flex>
       </Collapse>
     </Box>
   );
