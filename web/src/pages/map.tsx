@@ -172,6 +172,40 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   }, [data, selected]);
 
   const layers = [
+    new GeoJsonLayer({
+      id: "geojson-layer",
+      data: routes,
+      pickable: true,
+      autoHighlight: true,
+      lineWidthScale: 20,
+      lineWidthMinPixels: 2,
+      getLineColor: [160, 160, 180],
+      getLineWidth: 1,
+      getElevation: 10,
+    }),
+    new PathLayer({
+      id: "path-layer",
+      data: paths,
+      pickable: true,
+      autoHighlight: true,
+      widthScale: 5,
+      widthMinPixels: 1,
+      getPath: (d: any) => {
+        if (d.route === selected) {
+          return d.path;
+        } else {
+          return d.path.slice(-3);
+        }
+      },
+      getColor: (d: any) => {
+        if (d.route === selected) {
+          return [255, 99, 71];
+        } else {
+          return [0, 173, 230];
+        }
+      },
+      getWidth: 1,
+    }),
     new ScatterplotLayer({
       id: "scatterplot-layer",
       data: vehicles,
@@ -208,39 +242,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           easing: easeBackOut,
         },
       },
-    }),
-    new PathLayer({
-      id: "path-layer",
-      data: paths,
-      pickable: true,
-      autoHighlight: true,
-      widthScale: 5,
-      widthMinPixels: 1,
-      getPath: (d: any) => {
-        if (d.route === selected) {
-          return d.path;
-        } else {
-          return d.path.slice(-3);
-        }
-      },
-      getColor: (d: any) => {
-        if (d.route === selected) {
-          return [255, 99, 71];
-        } else {
-          return [0, 173, 230];
-        }
-      },
-      getWidth: 1,
-    }),
-    new GeoJsonLayer({
-      id: "geojson-layer",
-      data: routes,
-      pickable: true,
-      autoHighlight: true,
-      lineWidthScale: 20,
-      lineWidthMinPixels: 2,
-      getLineColor: [160, 160, 180],
-      getLineWidth: 1,
     }),
   ];
   return (
