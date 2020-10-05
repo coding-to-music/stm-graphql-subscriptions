@@ -9,6 +9,7 @@ import {
   Text,
   Collapse,
   Checkbox,
+  Input,
 } from "@chakra-ui/core";
 
 interface MapControlsProps {
@@ -19,6 +20,8 @@ interface MapControlsProps {
   handleOrient: any;
   visibleLayers: any;
   handleSetVisibleLayers: any;
+  filter: string;
+  handleSetFilter: any;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -29,6 +32,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   handleOrient,
   visibleLayers,
   handleSetVisibleLayers,
+  handleSetFilter,
 }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -127,6 +131,16 @@ const MapControls: React.FC<MapControlsProps> = ({
             Routes
           </Checkbox>
         </Flex>
+        <Box>
+          <Box mt={2}>Filter Routes</Box>
+          <Box>
+            <Input
+              onChange={handleSetFilter}
+              placeholder="24, 55, 80"
+              size="sm"
+            />
+          </Box>
+        </Box>
       </Collapse>
     </Box>
   );
