@@ -289,6 +289,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
             <Box>{`Route ${
               hoverInfo?.object.route || hoverInfo?.object.properties.route_id
             }`}</Box>
+            <Box>{hoverInfo?.object.properties?.route_name}</Box>
           </Box>
         ) : null}
       </DeckGL>
