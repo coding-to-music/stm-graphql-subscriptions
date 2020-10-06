@@ -114,6 +114,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       setVisibleLayers((prev) => ({ ...prev, routes: true }));
     }
   };
+  const [filteredResults, setFilteredResults] = useState();
 
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
@@ -191,14 +192,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [data, selected, visibleLayers]);
 
+  useEffect(() => {
+    if (filter) {
+      const results = routes.filter((value) =>
+        filter.includes(value.properties.route_id.toString())
+      );
+      setFilteredResults(results);
+      console.log(results);
+    } else {
+      setFilteredResults(null);
+    }
+  }, [routes, filter]);
+
   const layers = [
     new GeoJsonLayer({
       id: "geojson-layer",
-      data: filter
-        ? routes.filter((value) =>
-            filter.includes(value.properties.route_id.toString())
-          )
-        : routes,
+      data: filter ? filteredResults : routes,
       visible: visibleLayers.routes,
       pickable: true,
       autoHighlight: true,
@@ -303,7 +312,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
             p={1}
           >
             <Box>{`Route ${
-              hoverInfo?.object.route || hoverInfo?.object.properties.route_id
+              hoverInfo?.object.route || hoverInfo?.object.properties.headsign
             }`}</Box>
             <Box>{hoverInfo?.object.properties?.route_name}</Box>
           </Box>
@@ -318,6 +327,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         visibleLayers={visibleLayers}
         handleSetVisibleLayers={handleSetVisibleLayers}
         handleSetFilter={handleSetFilter}
+        filteredResults={filteredResults}
       />
     </Layout>
   );

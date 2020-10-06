@@ -22,6 +22,7 @@ interface MapControlsProps {
   handleSetVisibleLayers: any;
   filter: string;
   handleSetFilter: any;
+  filteredResults: any;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -33,9 +34,12 @@ const MapControls: React.FC<MapControlsProps> = ({
   visibleLayers,
   handleSetVisibleLayers,
   handleSetFilter,
+  filteredResults,
 }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
+  const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
+  const txtBordColor = { light: "gray.200", dark: "rgba(255,255,255,0.04)" };
   const color = { light: "black", dark: "white" };
   const [show, setShow] = useState(false);
   const handleToggle = () => setShow(!show);
@@ -133,14 +137,38 @@ const MapControls: React.FC<MapControlsProps> = ({
         </Flex>
         <Box>
           <Box mt={2}>Filter Routes</Box>
-          <Box>
+          <Box m={2}>
             <Input
               onChange={handleSetFilter}
               placeholder="24, 55, 80"
-              size="sm"
+              size="md"
             />
           </Box>
         </Box>
+        {filteredResults && filteredResults.length >= 1 ? (
+          <Box>
+            <Box mt={2}>Results</Box>
+            <Box
+              m={2}
+              p={1}
+              backgroundColor={txtBgColor[colorMode]}
+              border="1px solid"
+              borderColor={txtBordColor[colorMode]}
+              borderRadius="0.5rem"
+            >
+              {filteredResults
+                ? filteredResults.map((value) => (
+                    <Box key={value.properties.shape_id}>
+                      <Text>
+                        {value.properties.headsign}{" "}
+                        {value.properties.route_name}
+                      </Text>
+                    </Box>
+                  ))
+                : null}
+            </Box>
+          </Box>
+        ) : null}
       </Collapse>
     </Box>
   );
