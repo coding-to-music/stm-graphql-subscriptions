@@ -41,6 +41,27 @@ const positionGenerator = (arr: any) =>
     };
   });
 
+const colorizer = (str: string, filter: any) => {
+  let colorValue = [];
+  switch (str) {
+    case "verte":
+      colorValue = [0, 128, 0];
+      break;
+    case "orange":
+      colorValue = [255, 140, 0];
+      break;
+    case "jaune":
+      colorValue = [255, 215, 0];
+      break;
+    case "bleue":
+      colorValue = [30, 144, 255];
+      break;
+    default:
+      colorValue = filter ? [255, 99, 71] : [160, 160, 180];
+  }
+  return colorValue;
+};
+
 interface MapProps {
   defaultColor: string;
 }
@@ -195,10 +216,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   useEffect(() => {
     if (filter) {
       const results = routes.filter((value) =>
-        filter.includes(value.properties.route_id.toString())
+        filter?.includes(value.properties.route_id.toString())
       );
       setFilteredResults(results);
-      console.log(results);
     } else {
       setFilteredResults(null);
     }
@@ -213,9 +233,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       autoHighlight: true,
       lineWidthScale: 20,
       lineWidthMinPixels: 2,
-      getLineColor: filter ? [255, 99, 71] : [160, 160, 180],
+      // getLineColor: filter ? [255, 99, 71] : [160, 160, 180],
+      getLineColor: (d: any) => colorizer(d.properties.route_name, filter),
       getLineWidth: 1,
-      getElevation: 10,
       onHover: (info: any) => {
         setHoverInfo(info);
       },

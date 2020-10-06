@@ -146,7 +146,7 @@ const MapControls: React.FC<MapControlsProps> = ({
         </Box>
         {filteredResults && filteredResults.length >= 1 ? (
           <Box>
-            <Box mt={2}>Results</Box>
+            <Box mt={2}>Results:</Box>
             <Box
               m={2}
               p={1}
