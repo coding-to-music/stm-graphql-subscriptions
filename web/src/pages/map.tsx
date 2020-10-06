@@ -9,6 +9,7 @@ import { easeBackOut } from "d3";
 import { Box, useColorMode } from "@chakra-ui/core";
 import MapControls from "../components/MapControls";
 import routes from "../data/routes.json";
+import stops from "../data/stops.json";
 import { features as bikePaths } from "../data/bikePaths.json";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -42,7 +43,7 @@ const positionGenerator = (arr: any) =>
     };
   });
 
-const colorizer = (str: string, filter: any) => {
+const getMetroColors = (str: string, filter: any) => {
   let colorValue = [];
   switch (str) {
     case "verte":
@@ -112,12 +113,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         ...prev,
         bearing: prev.bearing !== 0 ? 0 : -57.5,
         transitionDuration: 500,
-      }; // const value = event.target.value;
+      };
     });
   };
 
+  const {
+    data,
+    // loading, error
+  } = usePositionsSubscription({});
+  const {
+    data: qdata,
+    // loading: qloading, error: qerror,
+  } = useGetPositionsQuery({});
+
   const [visibleLayers, setVisibleLayers] = useState({
     routes: false,
+    rtops: false,
     paths: true,
     vehicles: true,
     bikePaths: false,
@@ -144,14 +155,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
   const [paths, setPaths] = useState();
-  const {
-    data,
-    // loading, error
-  } = usePositionsSubscription({});
-  const {
-    data: qdata,
-    // loading: qloading, error: qerror,
-  } = useGetPositionsQuery({});
 
   useEffect(() => {
     if (mapMode === "monochrome") {
@@ -226,12 +229,13 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [routes, filter]);
 
+  const selectedPaths = [];
+
   const layers = [
     new GeoJsonLayer({
       id: "bike-layer",
-      data: bikePaths.filter(
-        (path: any) =>
-          path.properties.TYPE_VOIE === 3 || path.properties.TYPE_VOIE === 4
+      data: bikePaths.filter((path: any) =>
+        selectedPaths.includes(path.properties.TYPE_VOIE)
       ),
       visible: visibleLayers.bikePaths,
       pickable: true,
@@ -253,10 +257,40 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       autoHighlight: true,
       lineWidthScale: 20,
       lineWidthMinPixels: 2,
-      getLineColor: (d: any) => colorizer(d.properties.route_name, filter),
+      getLineColor: (d: any) => getMetroColors(d.properties.route_name, filter),
       getLineWidth: 1,
       onHover: (info: any) => {
         setHoverInfo(info);
+      },
+    }),
+    new GeoJsonLayer({
+      id: "stops-layer",
+      data: stops,
+      visible: visibleLayers.stops,
+      radiusScale: 2,
+      radiusMinPixels: 4,
+      radiusMaxPixels: 8,
+      getRadius: 25,
+      getPosition: (d: any) => d.geometry.coordinates,
+      getFillColor: [255, 99, 71],
+      pickable: true,
+      onClick: ({ object }: any) => {
+        console.log(`Route ${object.route}`);
+      },
+      onHover: (info: any) => {
+        setHoverInfo(info);
+        if (info.object) {
+          setSelected(info.object.route);
+        } else {
+          setSelected(null);
+        }
+      },
+      autoHighlight: true,
+      transitions: {
+        getRadius: {
+          duration: 1000,
+          easing: easeBackOut,
+        },
       },
     }),
     new PathLayer({
