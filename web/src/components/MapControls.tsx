@@ -20,7 +20,6 @@ interface MapControlsProps {
   handleOrient: any;
   visibleLayers: any;
   handleSetVisibleLayers: any;
-  filter: string;
   handleSetFilter: any;
   filteredResults: any;
 }
