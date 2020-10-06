@@ -9,6 +9,7 @@ import { easeBackOut } from "d3";
 import { Box, useColorMode } from "@chakra-ui/core";
 import MapControls from "../components/MapControls";
 import routes from "../data/routes.json";
+import { features as bikePaths } from "../data/bikePaths.json";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -119,6 +120,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     routes: false,
     paths: true,
     vehicles: true,
+    bikePaths: false,
   });
   const handleSetVisibleLayers = (event: any) => {
     const value = event.target.value;
@@ -226,14 +228,31 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   const layers = [
     new GeoJsonLayer({
-      id: "geojson-layer",
+      id: "bike-layer",
+      data: bikePaths.filter(
+        (path: any) =>
+          path.properties.TYPE_VOIE === 3 || path.properties.TYPE_VOIE === 4
+      ),
+      visible: visibleLayers.bikePaths,
+      pickable: true,
+      autoHighlight: true,
+      lineWidthScale: 2,
+      lineWidthMinPixels: 1,
+      lineWidthMaxPixels: 2,
+      getLineColor: [255, 99, 71],
+      getLineWidth: 1,
+      onHover: (info: any) => {
+        setHoverInfo(info);
+      },
+    }),
+    new GeoJsonLayer({
+      id: "transit-layer",
       data: filter ? filteredResults : routes,
       visible: visibleLayers.routes,
       pickable: true,
       autoHighlight: true,
       lineWidthScale: 20,
       lineWidthMinPixels: 2,
-      // getLineColor: filter ? [255, 99, 71] : [160, 160, 180],
       getLineColor: (d: any) => colorizer(d.properties.route_name, filter),
       getLineWidth: 1,
       onHover: (info: any) => {

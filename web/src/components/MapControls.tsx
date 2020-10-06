@@ -133,6 +133,14 @@ const MapControls: React.FC<MapControlsProps> = ({
           >
             Routes
           </Checkbox>
+          <Checkbox
+            value="bikePaths"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.bikePaths}
+            onChange={handleSetVisibleLayers}
+          >
+            Bike Paths
+          </Checkbox>
         </Flex>
         <Box>
           <Box mt={2}>Filter Routes</Box>
