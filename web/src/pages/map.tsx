@@ -110,6 +110,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [vehicles, setVehicles] = useState();
   const keyed: any = useRef({});
   const [paths, setPaths] = useState();
+  const [filteredStops, setFilteredStops] = useState();
 
   useEffect(() => {
     if (mapMode === "monochrome") {
@@ -178,11 +179,19 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const results = routes.filter((value) =>
         filter?.includes(value.properties.route_id.toString())
       );
+      const selectedStops = stops.filter((stop) => {
+        const routes = stop.properties.route_id;
+        if (routes !== null) {
+          const routesArray = routes.split(",");
+          return routesArray.some((route) => filter.includes(route));
+        }
+      });
       setFilteredResults(results);
+      setFilteredStops(selectedStops);
     } else {
-      setFilteredResults(null);
+      setFilteredStops(stops);
     }
-  }, [routes, filter]);
+  }, [stops, routes, filter]);
 
   const selectedPaths = [3, 4, 7];
 
@@ -220,7 +229,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new GeoJsonLayer({
       id: "stops-layer",
-      data: stops,
+      data: filter ? filteredStops : stops,
       visible: visibleLayers.stops,
       radiusScale: 2,
       radiusMinPixels: 4,
