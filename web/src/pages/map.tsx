@@ -108,8 +108,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
   const [vehicles, setVehicles] = useState();
+  const [filteredVehicles, setFilteredVehicles] = useState();
   const keyed: any = useRef({});
   const [paths, setPaths] = useState();
+  const [filteredPaths, setFilteredPaths] = useState();
   const [filteredStops, setFilteredStops] = useState();
 
   useEffect(() => {
@@ -186,10 +188,21 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
           return routesArray.some((route) => filter.includes(route));
         }
       });
+      const selectedVehicles = vehicles.filter((vehicle) => {
+        const route = vehicle.route;
+        return filter.includes(route);
+      });
+      const selectedPaths = paths.filter((path) => {
+        const route = path.route;
+        return filter.includes(route);
+      });
       setFilteredResults(results);
+      setVisibleLayers((prev) => ({ ...prev, stops: true }));
       setFilteredStops(selectedStops);
+      setFilteredVehicles(selectedVehicles);
+      setFilteredPaths(selectedPaths);
     } else {
-      setFilteredStops(stops);
+      setFilteredResults(null);
     }
   }, [stops, routes, filter]);
 
@@ -259,7 +272,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new PathLayer({
       id: "path-layer",
-      data: paths,
+      data: filter ? filteredPaths : paths,
       visible: visibleLayers.paths,
       pickable: true,
       autoHighlight: true,
@@ -284,7 +297,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new ScatterplotLayer({
       id: "scatterplot-layer",
-      data: vehicles,
+      data: filter ? filteredVehicles : vehicles,
       visible: visibleLayers.vehicles,
       radiusScale: 2,
       radiusMinPixels: 4,
