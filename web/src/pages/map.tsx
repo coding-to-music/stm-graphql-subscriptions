@@ -11,58 +11,12 @@ import MapControls from "../components/MapControls";
 import routes from "../data/routes.json";
 import stops from "../data/stops.json";
 import { features as bikePaths } from "../data/bikePaths.json";
-
-const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
-const initialViewState = {
-  longitude: -73.645,
-  latitude: 45.56,
-  zoom: 11,
-  pitch: 0,
-  bearing: -57.5,
-};
-
-const testPath = [
-  {
-    path: [
-      [-73.964792, 45.413806],
-      [-73.587076, 45.503546],
-      [-73.48159, 45.701829],
-    ],
-    name: "Montreal",
-  },
-];
-
-const positionGenerator = (arr: any) =>
-  arr.map((vehicle: any) => {
-    return {
-      id: vehicle.id,
-      timestamp: vehicle.timestamp,
-      route: vehicle.routeId,
-      position: [vehicle.position.longitude, vehicle.position.latitude],
-    };
-  });
-
-const getMetroColors = (str: string, filter: any) => {
-  let colorValue = [];
-  switch (str) {
-    case "verte":
-      colorValue = [0, 128, 0];
-      break;
-    case "orange":
-      colorValue = [255, 140, 0];
-      break;
-    case "jaune":
-      colorValue = [255, 215, 0];
-      break;
-    case "bleue":
-      colorValue = [30, 144, 255];
-      break;
-    default:
-      colorValue = filter ? [255, 99, 71] : [160, 160, 180];
-  }
-  return colorValue;
-};
+import {
+  MAPBOX_ACCESS_TOKEN,
+  initialViewState,
+  positionGenerator,
+  getMetroColors,
+} from "../utils/mapUtils";
 
 interface MapProps {
   defaultColor: string;
@@ -128,7 +82,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
 
   const [visibleLayers, setVisibleLayers] = useState({
     routes: false,
-    rtops: false,
+    stops: false,
     paths: true,
     vehicles: true,
     bikePaths: false,
@@ -137,6 +91,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     const value = event.target.value;
     setVisibleLayers((prev) => ({ ...prev, [value]: !prev[value] }));
   };
+
   const [filter, setFilter] = useState();
   const handleSetFilter = (event) => {
     const value = event.target.value;
@@ -229,7 +184,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [routes, filter]);
 
-  const selectedPaths = [];
+  const selectedPaths = [3, 4, 7];
 
   const layers = [
     new GeoJsonLayer({
@@ -250,7 +205,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       },
     }),
     new GeoJsonLayer({
-      id: "transit-layer",
+      id: "routes-layer",
       data: filter ? filteredResults : routes,
       visible: visibleLayers.routes,
       pickable: true,
@@ -275,7 +230,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getFillColor: [255, 99, 71],
       pickable: true,
       onClick: ({ object }: any) => {
-        console.log(`Route ${object.route}`);
+        console.log(object);
       },
       onHover: (info: any) => {
         setHoverInfo(info);
