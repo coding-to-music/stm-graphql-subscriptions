@@ -190,9 +190,9 @@ const MapControls: React.FC<MapControlsProps> = ({
         <Box mt={2}>Bike Paths</Box>
         <Flex direction="column" mt={1}>
           <Checkbox
-            value="bikePaths"
+            value="separated"
             variantColor={defaultColor}
-            isChecked={visibleLayers.bikePaths}
+            isChecked={visibleLayers.separated}
             onChange={handleSetVisibleLayers}
           >
             <Flex>
@@ -207,9 +207,9 @@ const MapControls: React.FC<MapControlsProps> = ({
             </Flex>
           </Checkbox>
           <Checkbox
-            value="bikePaths"
+            value="shared"
             variantColor={defaultColor}
-            isChecked={visibleLayers.bikePaths}
+            isChecked={visibleLayers.shared}
             onChange={handleSetVisibleLayers}
           >
             <Flex>
@@ -218,15 +218,15 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <Icon
                   name="minus"
                   size="24px"
-                  color={colorMode === "dark" ? "red.400" : "red.400"}
+                  color={colorMode === "dark" ? "red.200" : "red.500"}
                 />
               </Box>
             </Flex>
           </Checkbox>
           <Checkbox
-            value="bikePaths"
+            value="multiUse"
             variantColor={defaultColor}
-            isChecked={visibleLayers.bikePaths}
+            isChecked={visibleLayers.multiUse}
             onChange={handleSetVisibleLayers}
           >
             <Flex>
@@ -235,7 +235,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <Icon
                   name="minus"
                   size="24px"
-                  color={colorMode === "dark" ? "green.400" : "green.400"}
+                  color={colorMode === "dark" ? "green.200" : "green.500"}
                 />
               </Box>
             </Flex>

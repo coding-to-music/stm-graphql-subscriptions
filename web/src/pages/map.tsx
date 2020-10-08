@@ -87,7 +87,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     stops: false,
     paths: true,
     vehicles: true,
-    bikePaths: false,
+    shared: false,
+    separated: false,
+    multiUse: false,
   });
   const handleSetVisibleLayers = (event: any) => {
     const value = event.target.value;
@@ -208,9 +210,9 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [stops, routes, filter]);
 
-  const separated = [3, 4, 5, 6];
-  const shared = [1, 2, 8, 9];
-  const multiUse = [7];
+  const separated = visibleLayers.separated ? [3, 4, 5, 6] : [];
+  const shared = visibleLayers.shared ? [1, 2, 8, 9] : [];
+  const multiUse = visibleLayers.multiUse ? [7] : [];
   const selectedPaths = [...separated, ...shared, ...multiUse];
 
   const layers = [
@@ -219,11 +221,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       data: bikePaths.filter((path: any) =>
         selectedPaths.includes(path.properties.TYPE_VOIE)
       ),
-      visible: visibleLayers.bikePaths,
+      visible: true,
       pickable: true,
       autoHighlight: true,
       lineWidthScale: 2,
-      lineWidthMinPixels: 1,
+      lineWidthMinPixels: 2,
       lineWidthMaxPixels: 2,
       getLineColor: (d) => {
         if (separated.includes(d.properties.TYPE_VOIE)) {
@@ -232,12 +234,12 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
             : rgb(colors.purple[500]);
         } else if (d.properties.TYPE_VOIE === 7) {
           return colorMode === "dark"
-            ? rgb(colors.green[400])
-            : rgb(colors.green[400]);
+            ? rgb(colors.green[200])
+            : rgb(colors.green[500]);
         } else {
           return colorMode === "dark"
-            ? rgb(colors.red[400])
-            : rgb(colors.red[400]);
+            ? rgb(colors.red[200])
+            : rgb(colors.red[500]);
         }
       },
       getLineWidth: 1,
