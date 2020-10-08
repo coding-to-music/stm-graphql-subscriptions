@@ -228,16 +228,16 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getLineColor: (d) => {
         if (separated.includes(d.properties.TYPE_VOIE)) {
           return colorMode === "dark"
-            ? rgb(colors.red[400])
-            : rgb(colors.red[600]);
+            ? rgb(colors.purple[200])
+            : rgb(colors.purple[500]);
         } else if (d.properties.TYPE_VOIE === 7) {
           return colorMode === "dark"
             ? rgb(colors.green[400])
-            : rgb(colors.green[600]);
+            : rgb(colors.green[400]);
         } else {
           return colorMode === "dark"
-            ? rgb(colors.gray[400])
-            : rgb(colors.gray[600]);
+            ? rgb(colors.red[400])
+            : rgb(colors.red[400]);
         }
       },
       getLineWidth: 1,

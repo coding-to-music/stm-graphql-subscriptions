@@ -201,7 +201,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <Icon
                   name="minus"
                   size="24px"
-                  color={colorMode === "dark" ? "red.400" : "red.600"}
+                  color={colorMode === "dark" ? "purple.200" : "purple.500"}
                 />
               </Box>
             </Flex>
@@ -218,7 +218,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <Icon
                   name="minus"
                   size="24px"
-                  color={colorMode === "dark" ? "gray.400" : "gray.600"}
+                  color={colorMode === "dark" ? "red.400" : "red.400"}
                 />
               </Box>
             </Flex>
@@ -235,7 +235,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <Icon
                   name="minus"
                   size="24px"
-                  color={colorMode === "dark" ? "green.400" : "green.600"}
+                  color={colorMode === "dark" ? "green.400" : "green.400"}
                 />
               </Box>
             </Flex>
