@@ -49,3 +49,13 @@ export const getMetroColors = (str: string, filter: any) => {
   }
   return colorValue;
 };
+
+export const hexToRgb = (hex: string) => {
+  hex = hex.replace(/^#/, "");
+  hex = hex.slice(0, 6);
+  const number = Number.parseInt(hex, 16);
+  const red = number >> 16;
+  const green = (number >> 8) & 255;
+  const blue = number & 255;
+  return [red, green, blue];
+};

@@ -7,6 +7,7 @@ import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { easeBackOut } from "d3";
 import { Box, useColorMode } from "@chakra-ui/core";
+import colors from "@chakra-ui/core/dist/theme/colors";
 import MapControls from "../components/MapControls";
 import routes from "../data/routes.json";
 import stops from "../data/stops.json";
@@ -16,6 +17,7 @@ import {
   initialViewState,
   positionGenerator,
   getMetroColors,
+  hexToRgb as rgb,
 } from "../utils/mapUtils";
 
 interface MapProps {
@@ -206,7 +208,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   }, [stops, routes, filter]);
 
-  const selectedPaths = [3, 4, 7];
+  const separated = [3, 4, 5, 6];
+  const shared = [1, 2, 8, 9];
+  const multiUse = [7];
+  const selectedPaths = [...separated, ...shared, ...multiUse];
 
   const layers = [
     new GeoJsonLayer({
@@ -220,7 +225,21 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthScale: 2,
       lineWidthMinPixels: 1,
       lineWidthMaxPixels: 2,
-      getLineColor: [255, 99, 71],
+      getLineColor: (d) => {
+        if (separated.includes(d.properties.TYPE_VOIE)) {
+          return colorMode === "dark"
+            ? rgb(colors.red[400])
+            : rgb(colors.red[600]);
+        } else if (d.properties.TYPE_VOIE === 7) {
+          return colorMode === "dark"
+            ? rgb(colors.green[400])
+            : rgb(colors.green[600]);
+        } else {
+          return colorMode === "dark"
+            ? rgb(colors.gray[400])
+            : rgb(colors.gray[600]);
+        }
+      },
       getLineWidth: 1,
       onHover: (info: any) => {
         setHoverInfo(info);

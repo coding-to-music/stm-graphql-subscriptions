@@ -10,6 +10,7 @@ import {
   Collapse,
   Checkbox,
   Input,
+  Icon,
 } from "@chakra-ui/core";
 
 interface MapControlsProps {
@@ -117,7 +118,7 @@ const MapControls: React.FC<MapControlsProps> = ({
             <Radio value="satellite">Satellite</Radio>
           </RadioGroup>
         </Box>
-        <Box mt={2}>Layers</Box>
+        <Box mt={2}>Transit</Box>
         <Flex direction="column" mt={1}>
           <Checkbox
             value="vehicles"
@@ -150,14 +151,6 @@ const MapControls: React.FC<MapControlsProps> = ({
             onChange={handleSetVisibleLayers}
           >
             Routes
-          </Checkbox>
-          <Checkbox
-            value="bikePaths"
-            variantColor={defaultColor}
-            isChecked={visibleLayers.bikePaths}
-            onChange={handleSetVisibleLayers}
-          >
-            Bike Paths
           </Checkbox>
         </Flex>
         <Box>
@@ -194,6 +187,60 @@ const MapControls: React.FC<MapControlsProps> = ({
             </Box>
           </Box>
         ) : null}
+        <Box mt={2}>Bike Paths</Box>
+        <Flex direction="column" mt={1}>
+          <Checkbox
+            value="bikePaths"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.bikePaths}
+            onChange={handleSetVisibleLayers}
+          >
+            <Flex>
+              <Box>Separated</Box>
+              <Box ml={2}>
+                <Icon
+                  name="minus"
+                  size="24px"
+                  color={colorMode === "dark" ? "red.400" : "red.600"}
+                />
+              </Box>
+            </Flex>
+          </Checkbox>
+          <Checkbox
+            value="bikePaths"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.bikePaths}
+            onChange={handleSetVisibleLayers}
+          >
+            <Flex>
+              <Box>Shared</Box>
+              <Box ml={8}>
+                <Icon
+                  name="minus"
+                  size="24px"
+                  color={colorMode === "dark" ? "gray.400" : "gray.600"}
+                />
+              </Box>
+            </Flex>
+          </Checkbox>
+          <Checkbox
+            value="bikePaths"
+            variantColor={defaultColor}
+            isChecked={visibleLayers.bikePaths}
+            onChange={handleSetVisibleLayers}
+          >
+            <Flex>
+              <Box>Multi-use</Box>
+              <Box ml={4}>
+                <Icon
+                  name="minus"
+                  size="24px"
+                  color={colorMode === "dark" ? "green.400" : "green.600"}
+                />
+              </Box>
+            </Flex>
+          </Checkbox>
+        </Flex>
       </Collapse>
     </Box>
   );
