@@ -1,15 +1,14 @@
-import { Flex, useColorMode } from "@chakra-ui/core";
+import { Flex, useColorMode, FlexProps } from "@chakra-ui/core";
 
-interface ContainerProps {
-  props: any;
-}
+// interface ContainerProps {
+// }
 
-export const Container: React.FC<ContainerProps> = (props) => {
+// export const Container: React.FC<ContainerProps> = (props:FlexProps) => {
+export const Container = (props:FlexProps) => {
   const { colorMode } = useColorMode();
-
   const bgColor = { light: "gray.50", dark: "gray.900" };
-
   const color = { light: "black", dark: "white" };
+
   return (
     <Flex
       direction="column"

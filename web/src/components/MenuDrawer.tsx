@@ -40,7 +40,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
         isOpen={isOpen}
         placement="right"
         onClose={onClose}
-        finalFocusRef={btnRef}
+        finalFocusRef={btnRef as any}
       >
         <DrawerOverlay />
         <DrawerContent>

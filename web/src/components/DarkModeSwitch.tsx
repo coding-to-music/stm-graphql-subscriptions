@@ -19,7 +19,7 @@ export const DarkModeSwitch: React.FC<DarkModeSwitchProps> = ({
         mt={1}
         name="moon"
         size="14px"
-        opacity={colorMode !== "dark" ? "0.3" : null}
+        opacity={colorMode !== "dark" ? 0.3 : 1}
       />
       <Switch
         size="md"
@@ -32,7 +32,7 @@ export const DarkModeSwitch: React.FC<DarkModeSwitchProps> = ({
         mt={1}
         name="sun"
         size="14px"
-        opacity={colorMode !== "light" ? "0.3" : null}
+        opacity={colorMode !== "dark" ? 0.3 : 1}
       />
     </Flex>
   );

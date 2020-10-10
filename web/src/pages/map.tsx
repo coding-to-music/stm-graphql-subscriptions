@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
-import { StaticMap, FlyToInterpolator } from "react-map-gl";
+import { StaticMap } from "react-map-gl";
 import { DeckGL, ScatterplotLayer, PathLayer, GeoJsonLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
@@ -19,6 +19,7 @@ import {
   getMetroColors,
   hexToRgb as rgb,
 } from "../utils/mapUtils";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 
 interface MapProps {
   defaultColor: string;
@@ -59,8 +60,6 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     setViewState({
       ...viewState,
       ...initialViewState,
-      transitionDuration: 500,
-      transitionInterpolator: new FlyToInterpolator(),
     });
   };
   const handleOrient = () => {
@@ -93,11 +92,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   });
   const handleSetVisibleLayers = (event: any) => {
     const value = event.target.value;
-    setVisibleLayers((prev) => ({ ...prev, [value]: !prev[value] }));
+    setVisibleLayers((prev:any) => ({ ...prev, [value]: !prev[value] }));
   };
 
-  const [filter, setFilter] = useState();
-  const handleSetFilter = (event) => {
+  const [filter, setFilter] = useState<any[] | null>(null);
+  const handleSetFilter = (event:any) => {
     const value = event.target.value;
     const routeValues = value.replace(/\s/g, "").split(",");
     if (value === "") {
@@ -107,16 +106,16 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       setVisibleLayers((prev) => ({ ...prev, routes: true }));
     }
   };
-  const [filteredResults, setFilteredResults] = useState();
+  const [filteredResults, setFilteredResults] = useState<any[] | null>();
 
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
-  const [vehicles, setVehicles] = useState();
-  const [filteredVehicles, setFilteredVehicles] = useState();
+  const [vehicles, setVehicles] = useState<any[] | null>();
+  const [filteredVehicles, setFilteredVehicles] = useState<any[] | null>();
   const keyed: any = useRef({});
-  const [paths, setPaths] = useState();
-  const [filteredPaths, setFilteredPaths] = useState();
-  const [filteredStops, setFilteredStops] = useState();
+  const [paths, setPaths] = useState<any[] | null>();
+  const [filteredPaths, setFilteredPaths] = useState<any[] | null>();
+  const [filteredStops, setFilteredStops] = useState<any[] | null>();
 
   useEffect(() => {
     if (mapMode === "monochrome") {
@@ -185,18 +184,18 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       const results = routes.filter((value) =>
         filter?.includes(value.properties.route_id.toString())
       );
-      const selectedStops = stops.filter((stop) => {
+      const selectedStops = stops.filter((stop:any) => {
         const routes = stop.properties.route_id;
         if (routes !== null) {
           const routesArray = routes.split(",");
-          return routesArray.some((route) => filter.includes(route));
+          return routesArray.some((route:any) => filter.includes(route));
         }
       });
-      const selectedVehicles = vehicles.filter((vehicle) => {
+      const selectedVehicles = vehicles?.filter((vehicle:any) => {
         const route = vehicle.route;
         return filter.includes(route);
       });
-      const selectedPaths = paths.filter((path) => {
+      const selectedPaths = paths?.filter((path) => {
         const route = path.route;
         return filter.includes(route);
       });
@@ -215,6 +214,22 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const multiUse = visibleLayers.multiUse ? [7] : [];
   const selectedPaths = [...separated, ...shared, ...multiUse];
 
+  const getBikeColors =(d:any):RGBAColor=> {
+    if (separated.includes(d.properties.TYPE_VOIE)) {
+      return colorMode === "dark"
+        ? rgb(colors.purple[200])
+        : rgb(colors.purple[500]);
+    } else if (d.properties.TYPE_VOIE === 7) {
+      return colorMode === "dark"
+        ? rgb(colors.green[200])
+        : rgb(colors.green[500]);
+    } else {
+      return colorMode === "dark"
+        ? rgb(colors.red[200])
+        : rgb(colors.red[500]);
+    }
+  }
+
   const layers = [
     new GeoJsonLayer({
       id: "bike-layer",
@@ -227,21 +242,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthScale: 2,
       lineWidthMinPixels: 2,
       lineWidthMaxPixels: 2,
-      getLineColor: (d) => {
-        if (separated.includes(d.properties.TYPE_VOIE)) {
-          return colorMode === "dark"
-            ? rgb(colors.purple[200])
-            : rgb(colors.purple[500]);
-        } else if (d.properties.TYPE_VOIE === 7) {
-          return colorMode === "dark"
-            ? rgb(colors.green[200])
-            : rgb(colors.green[500]);
-        } else {
-          return colorMode === "dark"
-            ? rgb(colors.red[200])
-            : rgb(colors.red[500]);
-        }
-      },
+      getLineColor: (d:any) => getBikeColors(d),
       getLineWidth: 1,
       onHover: (info: any) => {
         setHoverInfo(info);

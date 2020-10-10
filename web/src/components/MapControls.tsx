@@ -70,7 +70,7 @@ const MapControls: React.FC<MapControlsProps> = ({
         <Box p={1}>
           <IconButton
             aria-label="orientation"
-            icon="repeat"
+            icon={"repeat" as any}
             onClick={() => handleOrient()}
             variantColor={defaultColor}
           />
@@ -175,7 +175,7 @@ const MapControls: React.FC<MapControlsProps> = ({
               borderRadius="0.5rem"
             >
               {filteredResults
-                ? filteredResults.map((value) => (
+                ? filteredResults.map((value:any) => (
                     <Box key={value.properties.shape_id}>
                       <Text>
                         {value.properties.headsign}{" "}

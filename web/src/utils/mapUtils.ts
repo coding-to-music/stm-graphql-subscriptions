@@ -1,4 +1,6 @@
 export const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+import {FlyToInterpolator } from "react-map-gl";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 
 export const initialViewState = {
   longitude: -73.645,
@@ -6,6 +8,8 @@ export const initialViewState = {
   zoom: 11,
   pitch: 0,
   bearing: -57.5,
+  transitionDuration: 500,
+  transitionInterpolator: new FlyToInterpolator(),
 };
 
 export const testPath = [
@@ -50,7 +54,7 @@ export const getMetroColors = (str: string, filter: any) => {
   return colorValue;
 };
 
-export const hexToRgb = (hex: string) => {
+export const hexToRgb = (hex: string):RGBAColor => {
   hex = hex.replace(/^#/, "");
   hex = hex.slice(0, 6);
   const number = Number.parseInt(hex, 16);

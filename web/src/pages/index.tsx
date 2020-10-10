@@ -33,8 +33,8 @@ const Index: React.FC<IndexProps> = ({ defaultColor }) => {
   return (
     <>
       <Navbar defaultColor={defaultColor} />
-      <Container props={null}>
-        <Hero defaultColor={defaultColor} title="ansel brandt" />
+      <Container>
+        <Hero title="ansel brandt" />
         <Main>
           <Text>
             Building the future with <Code>React</Code> + <Code>Node.js</Code> +{" "}

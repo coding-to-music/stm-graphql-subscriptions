@@ -10,7 +10,7 @@ interface CTAProps {
 export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
   return (
     <Container
-      flexDirection="row"
+      flexDirection='row'
       position="fixed"
       bottom="0"
       width="100%"
