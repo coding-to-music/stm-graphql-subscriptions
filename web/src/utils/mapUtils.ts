@@ -33,8 +33,8 @@ export const positionGenerator = (arr: any) =>
     };
   });
 
-export const getMetroColors = (str: string, filter: any) => {
-  let colorValue = [];
+export const getMetroColors = (str: string, filter: any):RGBAColor => {
+  let colorValue:RGBAColor = [0,0,0];
   switch (str) {
     case "verte":
       colorValue = [0, 128, 0];
