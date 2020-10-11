@@ -285,7 +285,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new GeoJsonLayer({
       id: "routes-layer",
-      data: filter ? filteredResults : routes,
+      data: (filter && filter?.length>0) ? filteredResults : routes,
       visible: visibleLayers.routes,
       pickable: true,
       autoHighlight: true,
@@ -299,7 +299,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new ScatterplotLayer({
       id: "stops-layer",
-      data: filter ? filteredStops : stops,
+      data: (filter && filter?.length>0) ? filteredStops : stops,
       visible: visibleLayers.stops,
       radiusScale: 2,
       radiusMinPixels: 2,
@@ -323,7 +323,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }),
     new PathLayer({
       id: "path-layer",
-      data: filter ? filteredPaths : paths,
+      data: (filter && filter?.length>0) ? filteredPaths : paths,
       visible: visibleLayers.paths,
       pickable: true,
       autoHighlight: true,
@@ -347,8 +347,8 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       getWidth: 1,
     }),
     new ScatterplotLayer({
-      id: "scatterplot-layer",
-      data: filter ? filteredVehicles : vehicles,
+      id: "vehicles-layer",
+      data:  (filter && filter?.length>0) ? filteredVehicles : vehicles,
       visible: visibleLayers.vehicles,
       radiusScale: 2,
       radiusMinPixels: 4,
