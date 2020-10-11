@@ -25,6 +25,14 @@ interface MapProps {
   defaultColor: string;
 }
 
+interface Path {
+  id: string;
+  route: string;
+  timestamp: number[];
+  path: number[][];
+  updated: boolean;
+}
+
 const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -95,27 +103,27 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     setVisibleLayers((prev:any) => ({ ...prev, [value]: !prev[value] }));
   };
 
-  const [filter, setFilter] = useState<any[] | null>(null);
+  const [filter, setFilter] = useState<Array<string> | null>();
   const handleSetFilter = (event:any) => {
     const value = event.target.value;
     const routeValues = value.replace(/\s/g, "").split(",");
     if (value === "") {
-      setFilter(null);
+      setFilter([]);
     } else {
       setFilter(routeValues);
       setVisibleLayers((prev) => ({ ...prev, routes: true }));
     }
   };
-  const [filteredResults, setFilteredResults] = useState<any[] | null>();
+  const [filteredResults, setFilteredResults] = useState<Array<object> | null>();
 
   const [selected, setSelected] = useState();
   const [hoverInfo, setHoverInfo] = useState();
-  const [vehicles, setVehicles] = useState<any[] | null>();
-  const [filteredVehicles, setFilteredVehicles] = useState<any[] | null>();
+  const [vehicles, setVehicles] = useState<Array<object> | null>();
+  const [filteredVehicles, setFilteredVehicles] = useState<Array<object> | null>();
   const keyed: any = useRef({});
-  const [paths, setPaths] = useState<any[] | null>();
-  const [filteredPaths, setFilteredPaths] = useState<any[] | null>();
-  const [filteredStops, setFilteredStops] = useState<any[] | null>();
+  const [paths, setPaths] = useState<Array<Path> | null>();
+  const [filteredPaths, setFilteredPaths] = useState<Array<object> | null>();
+  const [filteredStops, setFilteredStops] = useState<Array<object> | null>();
 
   useEffect(() => {
     if (mapMode === "monochrome") {
@@ -186,7 +194,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       );
       const selectedStops = stops.filter((stop:any) => {
         const routes = stop.properties.route_id;
-        if (routes !== null) {
+        if (routes) {
           const routesArray = routes.split(",");
           return routesArray.some((route:any) => filter.includes(route));
         }
@@ -196,7 +204,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         return filter.includes(route);
       });
       const selectedPaths = paths?.filter((path) => {
-        const route = path.route;
+        const route = path.route!;
         return filter.includes(route);
       });
       setFilteredResults(results);
@@ -205,7 +213,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       setFilteredVehicles(selectedVehicles);
       setFilteredPaths(selectedPaths);
     } else {
-      setFilteredResults(null);
+      setFilteredResults([]);
     }
   }, [stops, routes, filter]);
 
@@ -281,7 +289,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         if (info.object) {
           setSelected(info.object.route);
         } else {
-          setSelected(null);
+          setSelected([]);
         }
       },
       autoHighlight: true,
@@ -344,7 +352,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         if (info.object) {
           setSelected(info.object.route);
         } else {
-          setSelected(null);
+          setSelected([]);
         }
       },
       autoHighlight: true,
