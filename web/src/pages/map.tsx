@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
-import { StaticMap } from "react-map-gl";
+import { StaticMap, FlyToInterpolator } from "react-map-gl";
 import DeckGL from "@deck.gl/react";
 import {ScatterplotLayer, PathLayer, GeoJsonLayer } from '@deck.gl/layers'
 import { usePositionsSubscription } from "../generated/graphql";
@@ -23,6 +23,31 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 
 interface MapProps {
   defaultColor: string;
+}
+
+interface ViewState {
+  longitude: number;
+  latitude: number;
+  zoom: number;
+  pitch: number;
+  bearing: number;
+  transitionDuration?: number;
+  transitionInterpolator?: any;
+}
+
+interface HoverInfo {
+  color: [];
+  coordinate: [];
+  devicePixel: [];
+  index: number;
+  layer: any;
+  lngLat: [];
+  object?: any;
+  picked: boolean;
+  pixel: [];
+  pixelRatio: number;
+  x: number;
+  y: number;
 }
 
 interface Path {
@@ -62,12 +87,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     }
   };
 
-  const [viewState, setViewState] = useState(initialViewState);
+  const [viewState, setViewState] = useState<ViewState>(initialViewState);
   const handleChangeViewState = ({ viewState }: any) => setViewState(viewState);
   const handleFlyTo = () => {
     setViewState({
       ...viewState,
       ...initialViewState,
+      transitionDuration: 500,
+      transitionInterpolator: new FlyToInterpolator(),
     });
   };
   const handleOrient = () => {
@@ -117,7 +144,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [filteredResults, setFilteredResults] = useState<Array<object> | undefined>();
 
   const [selected, setSelected] = useState();
-  const [hoverInfo, setHoverInfo] = useState<object<unknown> | undefined>();
+  const [hoverInfo, setHoverInfo] = useState<HoverInfo>();
   const [vehicles, setVehicles] = useState<Array<object> | undefined>();
   const [filteredVehicles, setFilteredVehicles] = useState<Array<object> | undefined>();
   const keyed: any = useRef({});
@@ -252,7 +279,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthMaxPixels: 2,
       getLineColor: (d:any) => getBikeColors(d),
       getLineWidth: 1,
-      onHover: (info) => {
+      onHover: (info: any) => {
         setHoverInfo(info);
       },
     }),
@@ -266,7 +293,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthMinPixels: 2,
       getLineColor: (d: any) => getMetroColors(d.properties.route_name, filter),
       getLineWidth: 1,
-      onHover: (info) => {
+      onHover: (info: any) => {
         setHoverInfo(info);
       },
     }),
@@ -284,7 +311,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       onClick: ({ object }: any) => {
         console.log(object);
       },
-      onHover: (info) => {
+      onHover: (info: any) => {
         setHoverInfo(info);
         if (info.object) {
           setSelected(info.object.route);
@@ -341,7 +368,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       onClick: ({ object }: any) => {
         console.log(`Route ${object.route}`);
       },
-      onHover: (info) => {
+      onHover: (info: any) => {
         setHoverInfo(info);
         if (info.object) {
           setSelected(info.object.route);

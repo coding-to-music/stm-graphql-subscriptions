@@ -1,15 +1,12 @@
 export const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-import {FlyToInterpolator } from "react-map-gl";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 
-export const initialViewState:ViewStateProps = {
+export const initialViewState = {
   longitude: -73.645,
   latitude: 45.56,
   zoom: 11,
   pitch: 0,
   bearing: -57.5,
-  transitionDuration: 500,
-  transitionInterpolator: new FlyToInterpolator(),
 };
 
 export const testPath = [
