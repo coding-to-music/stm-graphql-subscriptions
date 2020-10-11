@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { StaticMap } from "react-map-gl";
-import { DeckGL, ScatterplotLayer, PathLayer, GeoJsonLayer } from "deck.gl";
+import DeckGL from "@deck.gl/react";
+import {ScatterplotLayer, PathLayer, GeoJsonLayer } from '@deck.gl/layers'
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
 import { Box, useColorMode } from "@chakra-ui/core";
@@ -70,7 +71,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     });
   };
   const handleOrient = () => {
-    setViewState((prev) => {
+    setViewState((prev:any) => {
       return {
         ...prev,
         bearing: prev.bearing !== 0 ? 0 : -57.5,
@@ -116,7 +117,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const [filteredResults, setFilteredResults] = useState<Array<object> | undefined>();
 
   const [selected, setSelected] = useState();
-  const [hoverInfo, setHoverInfo] = useState<object | undefined>();
+  const [hoverInfo, setHoverInfo] = useState<object<unknown> | undefined>();
   const [vehicles, setVehicles] = useState<Array<object> | undefined>();
   const [filteredVehicles, setFilteredVehicles] = useState<Array<object> | undefined>();
   const keyed: any = useRef({});
@@ -251,7 +252,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthMaxPixels: 2,
       getLineColor: (d:any) => getBikeColors(d),
       getLineWidth: 1,
-      onHover: (info: any) => {
+      onHover: (info) => {
         setHoverInfo(info);
       },
     }),
@@ -265,7 +266,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       lineWidthMinPixels: 2,
       getLineColor: (d: any) => getMetroColors(d.properties.route_name, filter),
       getLineWidth: 1,
-      onHover: (info: any) => {
+      onHover: (info) => {
         setHoverInfo(info);
       },
     }),
@@ -283,7 +284,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       onClick: ({ object }: any) => {
         console.log(object);
       },
-      onHover: (info: any) => {
+      onHover: (info) => {
         setHoverInfo(info);
         if (info.object) {
           setSelected(info.object.route);
@@ -340,7 +341,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       onClick: ({ object }: any) => {
         console.log(`Route ${object.route}`);
       },
-      onHover: (info: any) => {
+      onHover: (info) => {
         setHoverInfo(info);
         if (info.object) {
           setSelected(info.object.route);
