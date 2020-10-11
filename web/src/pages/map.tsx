@@ -5,7 +5,6 @@ import { StaticMap } from "react-map-gl";
 import { DeckGL, ScatterplotLayer, PathLayer, GeoJsonLayer } from "deck.gl";
 import { usePositionsSubscription } from "../generated/graphql";
 import { useGetPositionsQuery } from "../generated/graphql";
-import { easeBackOut } from "d3";
 import { Box, useColorMode } from "@chakra-ui/core";
 import colors from "@chakra-ui/core/dist/theme/colors";
 import MapControls from "../components/MapControls";
@@ -103,7 +102,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     setVisibleLayers((prev:any) => ({ ...prev, [value]: !prev[value] }));
   };
 
-  const [filter, setFilter] = useState<Array<string> | null>();
+  const [filter, setFilter] = useState<Array<string> | undefined>();
   const handleSetFilter = (event:any) => {
     const value = event.target.value;
     const routeValues = value.replace(/\s/g, "").split(",");
@@ -114,16 +113,16 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
       setVisibleLayers((prev) => ({ ...prev, routes: true }));
     }
   };
-  const [filteredResults, setFilteredResults] = useState<Array<object> | null>();
+  const [filteredResults, setFilteredResults] = useState<Array<object> | undefined>();
 
   const [selected, setSelected] = useState();
-  const [hoverInfo, setHoverInfo] = useState();
-  const [vehicles, setVehicles] = useState<Array<object> | null>();
-  const [filteredVehicles, setFilteredVehicles] = useState<Array<object> | null>();
+  const [hoverInfo, setHoverInfo] = useState<object | undefined>();
+  const [vehicles, setVehicles] = useState<Array<object> | undefined>();
+  const [filteredVehicles, setFilteredVehicles] = useState<Array<object> | undefined>();
   const keyed: any = useRef({});
-  const [paths, setPaths] = useState<Array<Path> | null>();
-  const [filteredPaths, setFilteredPaths] = useState<Array<object> | null>();
-  const [filteredStops, setFilteredStops] = useState<Array<object> | null>();
+  const [paths, setPaths] = useState<Array<Path> | undefined>();
+  const [filteredPaths, setFilteredPaths] = useState<Array<object> | undefined>();
+  const [filteredStops, setFilteredStops] = useState<Array<object> | undefined>();
 
   useEffect(() => {
     if (mapMode === "monochrome") {
@@ -270,14 +269,14 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         setHoverInfo(info);
       },
     }),
-    new GeoJsonLayer({
+    new ScatterplotLayer({
       id: "stops-layer",
       data: filter ? filteredStops : stops,
       visible: visibleLayers.stops,
       radiusScale: 2,
-      radiusMinPixels: 4,
-      radiusMaxPixels: 8,
-      getRadius: 25,
+      radiusMinPixels: 2,
+      radiusMaxPixels: 4,
+      getRadius: 15,
       getPosition: (d: any) => d.geometry.coordinates,
       getFillColor: [255, 99, 71],
       pickable: true,
@@ -289,16 +288,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         if (info.object) {
           setSelected(info.object.route);
         } else {
-          setSelected([]);
+          setSelected(undefined);
         }
       },
       autoHighlight: true,
-      transitions: {
-        getRadius: {
-          duration: 1000,
-          easing: easeBackOut,
-        },
-      },
     }),
     new PathLayer({
       id: "path-layer",
@@ -352,16 +345,10 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
         if (info.object) {
           setSelected(info.object.route);
         } else {
-          setSelected([]);
+          setSelected(undefined);
         }
       },
       autoHighlight: true,
-      transitions: {
-        getRadius: {
-          duration: 1000,
-          easing: easeBackOut,
-        },
-      },
     }),
   ];
   return (
