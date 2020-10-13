@@ -250,11 +250,11 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
   const selectedPaths = [...separated, ...shared, ...multiUse];
 
   const getBikeColors =(d:any):RGBAColor=> {
-    if (separated.includes(d.properties.TYPE_VOIE)) {
+    if (separated.includes(d.properties.type)) {
       return colorMode === "dark"
         ? rgb(colors.purple[200])
         : rgb(colors.purple[500]);
-    } else if (d.properties.TYPE_VOIE === 7) {
+    } else if (d.properties.type === 7) {
       return colorMode === "dark"
         ? rgb(colors.green[200])
         : rgb(colors.green[500]);
@@ -269,7 +269,7 @@ const Map: React.FC<MapProps> = ({ defaultColor }) => {
     new GeoJsonLayer({
       id: "bike-layer",
       data: bikePaths.filter((path: any) =>
-        selectedPaths.includes(path.properties.TYPE_VOIE)
+        selectedPaths.includes(path.properties.type)
       ),
       visible: true,
       pickable: true,
