@@ -59,6 +59,9 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
         mr={2}
         display={["none", "flex", "flex", "flex"]}
       >
+        <NextLink href="/charts">
+          <Link mr={8}>Charts</Link>
+        </NextLink>
         <NextLink href="/map">
           <Link mr={8}>Map</Link>
         </NextLink>
@@ -79,6 +82,11 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
           <Box mt={6}>
             <NextLink href="/">
               <Link>Home</Link>
+            </NextLink>
+          </Box>
+          <Box mt={6}>
+            <NextLink href="/charts">
+              <Link>Charts</Link>
             </NextLink>
           </Box>
           <Box mt={6}>
