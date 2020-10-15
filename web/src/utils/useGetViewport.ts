@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
 export const useGetViewport = () => {
-  const [width, setWidth] = useState(window.innerWidth);
-  const [height, setHeight] = useState(window.innerHeight);
+  const isSSR = typeof window;
+  const [width, setWidth] = useState(isSSR ? 1200 : window.innerWidth);
+  const [height, setHeight] = useState(isSSR ? 800 : window.innerHeight);
 
   useEffect(() => {
     const handleResize = () => {
