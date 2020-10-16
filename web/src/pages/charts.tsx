@@ -46,6 +46,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
   const [rawData, setRawData] = useState();
   const [data, setData] = useState();
   const svgRef = useRef();
+  const [hoverInfo, setHoverInfo] = useState()
 
   useEffect(() => {
     fetch("./unemployment.tsv")
@@ -114,7 +115,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
       const dot = svg.append("g").attr("display", "none");
 
-      dot.append("circle").attr("r", 2.5);
+      dot.append("circle").attr("r", 3);
 
       dot
         .append("text")
@@ -128,7 +129,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           .selectAll(".line")
           .style("mix-blend-mode", null)
           .attr("stroke", "#ddd");
-        dot.attr("display", null);
+        dot.attr("display", 'visible');
       };
 
       const left = () => {
@@ -137,6 +138,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
           .attr("stroke", chartColor[colorMode]);
         dot.attr("display", "none");
+        setHoverInfo(null)
       };
 
       // xm: date, ym: unemployment, i: index, s: data object
@@ -156,8 +158,14 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         dot.attr(
           "transform",
           `translate(${x(data.dates[i])},${y(s.values[i])})`
-        );
-        dot.select("text").style('fill', color[colorMode]).text(s.name);
+        ).attr("fill", highlightColor[colorMode]);
+        dot.select("text").style('fill', color[colorMode])
+        // .text(s.name);
+        setHoverInfo({
+          text: s.name,
+          x: x(data.dates[i]) + margin.left + margin.right,
+          y: y(s.values[i]) + margin.top + margin.bottom
+        })
       };
 
       const rect = (g) =>
@@ -211,9 +219,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           <g className="xAxis" />
           <g className="yAxis" />
         </svg>
+        {hoverInfo ? (
+          <Box pos="absolute" left={hoverInfo.x} top={hoverInfo.y}>{hoverInfo.text}</Box>
+        ) : null}
       </Box>
 
-    </Layout>
+    </Layout >
   )
 }
 
