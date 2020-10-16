@@ -142,16 +142,13 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           dot.attr("display", "none");
         };
 
+        // xm: date, ym: unemployment, i: index, s: data object
         const moved = (event) => {
           event.preventDefault();
           const cursorPosition = pointer(event, this);
-          // date
           const xm = x.invert(cursorPosition[0]);
-          // unemployment %
           const ym = y.invert(cursorPosition[1]);
-          // index
           const i = bisectCenter(data.dates, xm);
-          // data object
           const s = least(data.series, (d) => Math.abs(d.values[i] - ym));
 
           svg
