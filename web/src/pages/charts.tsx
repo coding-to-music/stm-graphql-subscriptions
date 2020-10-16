@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
 import { Box, Link, Icon, useColorMode } from "@chakra-ui/core";
-// import colors from "@chakra-ui/core/dist/theme/colors";
+import colors from "@chakra-ui/core/dist/theme/colors";
 // import {
 //   hexToRgb as rgb,
 // } from "../utils/mapUtils";
@@ -31,10 +31,13 @@ interface ChartsProps {
 const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
   const { colorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
-  // const color = { light: "black", dark: "white" };
+  const color = { light: "black", dark: "white" };
   // const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
   const bordColor = { light: "gray.200", dark: "rgba(255,255,255,0.04)" };
-  const chartColor = { light: "steelblue", dark: "gainsboro" };
+  const chartColor = { light: colors.purple[200], dark: colors.purple[600] };
+  const highlightColor = { light: colors.purple[600], dark: colors.purple[300] }
+  const muteColor = { light: colors.purple[100], dark: colors.purple[900] }
+
   const linkColor = { light: 'purple.500', dark: 'purple.200' }
 
   const { width: viewportWidth, height: viewportHeight } = useGetViewport();
@@ -131,8 +134,8 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
       const left = () => {
         svg
           .selectAll(".line")
-          .style("mix-blend-mode", "multiply")
-          .attr("stroke", 'steelblue');
+          .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
+          .attr("stroke", chartColor[colorMode]);
         dot.attr("display", "none");
       };
 
@@ -147,14 +150,14 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
         svg
           .selectAll(".line")
-          .attr("stroke", (d) => (d === s ? 'steelblue' : "#ddd"))
+          .attr("stroke", (d) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
           .filter((d) => d === s)
           .raise();
         dot.attr(
           "transform",
           `translate(${x(data.dates[i])},${y(s.values[i])})`
         );
-        dot.select("text").text(s.name);
+        dot.select("text").style('fill', color[colorMode]).text(s.name);
       };
 
       const rect = (g) =>
@@ -182,15 +185,15 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         .join("path")
         .attr("class", "line")
         .attr("fill", "none")
-        .attr("stroke", 'steelblue')
+        .attr("stroke", chartColor[colorMode])
         .attr("stroke-width", 1.5)
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
-        .style("mix-blend-mode", "multiply")
+        .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
         .attr("d", (d) => getLine(d.values));
 
     }
-  }, [width, height, data, svgRef]);
+  }, [width, height, data, svgRef, colorMode]);
 
   return (
     <Layout defaultColor={defaultColor}>
