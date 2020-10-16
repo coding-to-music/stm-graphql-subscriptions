@@ -105,96 +105,90 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
               .text(data.y)
           );
 
+      const svg = select(svgRef.current);
+      svg.selectAll("g").remove();
+      svg.attr("width", `${width}px`).attr("height", `${height}px`);
+
+      const dot = svg.append("g").attr("display", "none");
+
+      dot.append("circle").attr("r", 2.5);
+
+      dot
+        .append("text")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "middle")
+        .attr("y", -8);
+
+      const entered = () => {
+        svg
+          .selectAll(".line")
+          .style("mix-blend-mode", null)
+          .attr("stroke", "#ddd");
+        dot.attr("display", null);
+      };
+
+      const left = () => {
+        svg
+          .selectAll(".line")
+          .style("mix-blend-mode", "multiply")
+          .attr("stroke", 'steelblue');
+        dot.attr("display", "none");
+      };
+
+      // xm: date, ym: unemployment, i: index, s: data object
+      const moved = (event) => {
+        event.preventDefault();
+        const cursorPosition = pointer(event, this);
+        const xm = x.invert(cursorPosition[0]);
+        const ym = y.invert(cursorPosition[1]);
+        const i = bisectCenter(data.dates, xm);
+        const s = least(data.series, (d) => Math.abs(d.values[i] - ym));
+
+        svg
+          .selectAll(".line")
+          .attr("stroke", (d) => (d === s ? 'steelblue' : "#ddd"))
+          .filter((d) => d === s)
+          .raise();
+        dot.attr(
+          "transform",
+          `translate(${x(data.dates[i])},${y(s.values[i])})`
+        );
+        dot.select("text").text(s.name);
+      };
+
+      const rect = (g) =>
+        g
+          .append("rect")
+          .attr("fill", "transparent")
+          .attr("width", width)
+          .attr("height", height)
+          .on("mousemove", moved)
+          .on("mouseenter", entered)
+          .on("mouseleave", left);
+
+      svg.append("g").call(xAxis);
+      svg.append("g").call(yAxis);
+      svg.append("g").call(rect);
+
       const getLine = line()
         .defined((d) => !isNaN(d))
         .x((d, i) => x(data.dates[i]))
         .y((d) => y(d));
 
-      const chart = () => {
-        const svg = select(svgRef.current);
-        svg.selectAll("g").remove();
-        svg.attr("width", `${width}px`).attr("height", `${height}px`);
+      svg
+        .selectAll(".line")
+        .data(data.series)
+        .join("path")
+        .attr("class", "line")
+        .attr("fill", "none")
+        .attr("stroke", 'steelblue')
+        .attr("stroke-width", 1.5)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .style("mix-blend-mode", "multiply")
+        .attr("d", (d) => getLine(d.values));
 
-        const dot = svg.append("g").attr("display", "none");
-
-        dot.append("circle").attr("r", 2.5);
-
-        dot
-          .append("text")
-          .attr("font-family", "sans-serif")
-          .attr("font-size", 10)
-          .attr("text-anchor", "middle")
-          .attr("y", -8);
-
-        const entered = () => {
-          svg
-            .selectAll("path")
-            .style("mix-blend-mode", null)
-            .attr("stroke", "#ddd");
-          dot.attr("display", null);
-        };
-
-        const left = () => {
-          svg
-            .selectAll("path")
-            .style("mix-blend-mode", "multiply")
-            .attr("stroke", null);
-          dot.attr("display", "none");
-        };
-
-        // xm: date, ym: unemployment, i: index, s: data object
-        const moved = (event) => {
-          event.preventDefault();
-          const cursorPosition = pointer(event, this);
-          const xm = x.invert(cursorPosition[0]);
-          const ym = y.invert(cursorPosition[1]);
-          const i = bisectCenter(data.dates, xm);
-          const s = least(data.series, (d) => Math.abs(d.values[i] - ym));
-
-          svg
-            .selectAll("path")
-            .attr("stroke", (d) => (d === s ? null : "#ddd"))
-            .filter((d) => d === s)
-            .raise();
-          dot.attr(
-            "transform",
-            `translate(${x(data.dates[i])},${y(s.values[i])})`
-          );
-          dot.select("text").text(s.name);
-        };
-
-        const rect = (g) =>
-          g
-            .append("rect")
-            .attr("fill", "transparent")
-            .attr("width", width)
-            .attr("height", height)
-            .on("mousemove", moved)
-            .on("mouseenter", entered)
-            .on("mouseleave", left);
-
-        svg.append("g").call(xAxis);
-        svg.append("g").call(yAxis);
-        svg.append("g").call(rect);
-
-        const path = () => {
-          svg
-            .append("g")
-            .attr("fill", "none")
-            .attr("stroke", 'steelblue')
-            .attr("stroke-width", 1.5)
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
-            .selectAll("path")
-            .data(data.series)
-            .join("path")
-            .style("mix-blend-mode", "multiply")
-            .attr("d", (d) => getLine(d.values));
-        };
-
-        svg.call(path);
-      };
-      chart();
     }
   }, [width, height, data, svgRef]);
 
