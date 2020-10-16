@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export const useGetViewport = () => {
-  const isSSR = typeof window;
+  const isSSR = typeof window === "undefined";
   const [width, setWidth] = useState(isSSR ? 1200 : window.innerWidth);
   const [height, setHeight] = useState(isSSR ? 800 : window.innerHeight);
 
