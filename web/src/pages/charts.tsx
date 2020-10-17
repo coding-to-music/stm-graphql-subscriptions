@@ -24,6 +24,17 @@ import {
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
 
+interface Data {
+  dates: [];
+  series: [];
+}
+
+interface HoverInfo {
+  text: string;
+  x: number;
+  y: number;
+}
+
 interface ChartsProps {
   defaultColor: string;
 }
@@ -43,10 +54,10 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
   const { width: viewportWidth, height: viewportHeight } = useGetViewport();
   const width = viewportWidth * 0.8;
   const height = viewportHeight * 0.8;
-  const [rawData, setRawData] = useState();
-  const [data, setData] = useState();
-  const svgRef = useRef();
-  const [hoverInfo, setHoverInfo] = useState()
+  const [rawData, setRawData] = useState<string | undefined>();
+  const [data, setData] = useState<Data | undefined>();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
 
   useEffect(() => {
     fetch("./unemployment.tsv")
@@ -56,12 +67,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
   useEffect(() => {
     if (rawData) {
-      const parsed = tsvParse(rawData);
+      const parsed = tsvParse(rawData!);
       const columns = parsed.columns.slice(1);
-      const formatted = parsed.map((entry) => {
+      const formatted = parsed.map((entry: any) => {
         return {
-          name: entry.name.replace(/, ([\w-]+).*/, " $1"),
-          values: columns.map((k) => +entry[k]),
+          name: entry.name!.replace(/, ([\w-]+).*/, " $1"),
+          values: columns.map((k) => +entry[k]!),
         };
       });
       const dates = columns.map(utcParse("%Y-%m"));
@@ -138,11 +149,11 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
           .attr("stroke", chartColor[colorMode]);
         dot.attr("display", "none");
-        setHoverInfo(null)
+        setHoverInfo(undefined)
       };
 
       // xm: date, ym: unemployment, i: index, s: data object
-      const moved = (event) => {
+      const moved = (event: any) => {
         event.preventDefault();
         const cursorPosition = pointer(event, this);
         const xm = x.invert(cursorPosition[0]);
@@ -183,9 +194,9 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
       svg.append("g").call(rect);
 
       const getLine = line()
-        .defined((d) => !isNaN(d))
-        .x((d, i) => x(data.dates[i]))
-        .y((d) => y(d));
+        .defined((d: any) => !isNaN(d))
+        .x((_: any, i: any) => x(data.dates[i]))
+        .y((d: any) => y(d));
 
       svg
         .selectAll(".line")
@@ -198,7 +209,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
-        .attr("d", (d) => getLine(d.values));
+        .attr("d", (d: any) => getLine(d.values));
 
     }
   }, [width, height, data, svgRef, colorMode]);
@@ -220,7 +231,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           <g className="yAxis" />
         </svg>
         {hoverInfo ? (
-          <Box pos="absolute" left={hoverInfo.x} top={hoverInfo.y}>{hoverInfo.text}</Box>
+          <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>{hoverInfo!.text}</Box>
         ) : null}
       </Box>
 
