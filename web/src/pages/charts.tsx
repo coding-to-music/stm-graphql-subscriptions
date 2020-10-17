@@ -27,6 +27,7 @@ import { useGetViewport } from "../utils/useGetViewport";
 interface Data {
   dates: [];
   series: [];
+  y: string
 }
 
 interface HoverInfo {
@@ -72,7 +73,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
       const formatted = parsed.map((entry: any) => {
         return {
           name: entry.name!.replace(/, ([\w-]+).*/, " $1"),
-          values: columns.map((k) => +entry[k]!),
+          values: columns.map((k: any) => +entry[k]!),
         };
       });
       const dates = columns.map(utcParse("%Y-%m"));
@@ -94,23 +95,23 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         .range([margin.left, width - margin.right]);
 
       const y = scaleLinear()
-        .domain([0, max(data.series, (d) => max(d.values))])
+        .domain([0, max(data.series, (d: any) => max(d.values))])
         .nice()
         .range([height - margin.bottom, margin.top]);
 
-      const xAxis = (g) =>
+      const xAxis = (g: any) =>
         g.attr("transform", `translate(0,${height - margin.bottom})`).call(
           axisBottom(x)
             .ticks(width / 80)
             .tickSizeOuter(0)
         );
 
-      const yAxis = (g) =>
+      const yAxis = (g: any) =>
         g
           .attr("transform", `translate(${margin.left},0)`)
           .call(axisLeft(y))
-          .call((g) => g.select(".domain").remove())
-          .call((g) =>
+          .call((g: any) => g.select(".domain").remove())
+          .call((g: any) =>
             g
               .select(".tick:last-of-type text")
               .clone()
@@ -139,7 +140,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         svg
           .selectAll(".line")
           .style("mix-blend-mode", null)
-          .attr("stroke", "#ddd");
+          .attr("stroke", muteColor[colorMode]);
         dot.attr("display", 'visible');
       };
 
@@ -159,12 +160,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         const xm = x.invert(cursorPosition[0]);
         const ym = y.invert(cursorPosition[1]);
         const i = bisectCenter(data.dates, xm);
-        const s = least(data.series, (d) => Math.abs(d.values[i] - ym));
+        const s = least(data.series, (d: any) => Math.abs(d.values[i] - ym));
 
         svg
           .selectAll(".line")
-          .attr("stroke", (d) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
-          .filter((d) => d === s)
+          .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
+          .filter((d: any) => d === s)
           .raise();
         dot.attr(
           "transform",
@@ -179,7 +180,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         })
       };
 
-      const rect = (g) =>
+      const rect = (g: any) =>
         g
           .append("rect")
           .attr("fill", "transparent")
