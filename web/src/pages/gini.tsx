@@ -20,7 +20,6 @@ import {
     bisectCenter,
     least,
     format,
-    curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
 
