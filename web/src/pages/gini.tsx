@@ -195,8 +195,8 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             svg.append("g").call(rect);
 
             const getLine = line()
-                .defined((d: any) => !isNaN(d))
                 .x((_: any, i: any) => x(data.dates[i]))
+                .defined((d: any) => d !== 0)
                 .y((d: any) => y(d))
 
             svg
