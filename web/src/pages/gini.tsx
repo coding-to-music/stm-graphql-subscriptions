@@ -13,14 +13,14 @@ import {
     axisBottom,
     axisLeft,
     scaleLinear,
-    tsvParse,
-    utcParse,
+    csvParse,
     max,
-    scaleUtc,
     extent,
     pointer,
     bisectCenter,
     least,
+    format,
+    curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
 
@@ -61,36 +61,40 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
 
     useEffect(() => {
-        fetch("./unemployment.tsv")
+        fetch("./giniIndex.csv")
             .then((response) => response.text())
             .then((data) => setRawData(data));
     });
 
     useEffect(() => {
         if (rawData) {
-            const parsed = tsvParse(rawData!);
+            const parsed = csvParse(rawData!);
             const columns = parsed.columns.slice(1);
             const formatted = parsed.map((entry: any) => {
                 return {
-                    name: entry.name!.replace(/, ([\w-]+).*/, " $1"),
+                    name: entry.country!,
                     values: columns.map((k: any) => +entry[k]!),
                 };
             });
-            const dates = columns.map(utcParse("%Y-%m"));
+            console.log(formatted)
+            const dates = columns.map((d: any) => +d);
             const dataObject = {
-                y: "% Unemployment",
+                y: "Gini index",
                 series: formatted,
                 dates: dates,
             };
-            // console.log(dataObject.series[0].values);
+            // // console.log(dataObject.series[0].values);
             setData(dataObject);
         }
     }, [rawData]);
 
     useEffect(() => {
         const margin = { top: 20, right: 20, bottom: 30, left: 30 };
+        const svg = select(svgRef.current);
+        svg.selectAll("g").remove();
+        svg.attr("width", `${width}px`).attr("height", `${height}px`);
         if (data) {
-            const x = scaleUtc()
+            const x = scaleLinear()
                 .domain(extent(data.dates))
                 .range([margin.left, width - margin.right]);
 
@@ -103,6 +107,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 g.attr("transform", `translate(0,${height - margin.bottom})`).call(
                     axisBottom(x)
                         .ticks(width / 80)
+                        .tickFormat(format("d"))
                         .tickSizeOuter(0)
                 );
 
@@ -120,10 +125,6 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                             .attr("font-weight", "bold")
                             .text(data.y)
                     );
-
-            const svg = select(svgRef.current);
-            svg.selectAll("g").remove();
-            svg.attr("width", `${width}px`).attr("height", `${height}px`);
 
             const dot = svg.append("g").attr("display", "none");
 
@@ -153,7 +154,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 setHoverInfo(undefined)
             };
 
-            // xm: date, ym: unemployment, i: index, s: data object
+            // xm: date, ym: giniIndex, i: index, s: data object
             const moved = (event: any) => {
                 event.preventDefault();
                 const cursorPosition = pointer(event, this);
@@ -197,7 +198,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const getLine = line()
                 .defined((d: any) => !isNaN(d))
                 .x((_: any, i: any) => x(data.dates[i]))
-                .y((d: any) => y(d));
+                .y((d: any) => y(d))
 
             svg
                 .selectAll(".line")
@@ -218,8 +219,8 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     return (
         <Layout defaultColor={defaultColor}>
             <Box mb={2} >
-                <Link color={linkColor[colorMode]} href="https://observablehq.com/@d3/multi-line-chart" isExternal>
-                    Observable Example<Icon name="external-link" mx="2px" />
+                <Link color={linkColor[colorMode]} href="https://data.worldbank.org/indicator/SI.POV.GINI" isExternal>
+                    World Bank Estimate<Icon name="external-link" mx="2px" />
                 </Link>
             </Box>
             <Box
