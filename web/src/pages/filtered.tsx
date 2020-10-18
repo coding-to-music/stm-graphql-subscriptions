@@ -233,9 +233,6 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .attr("stroke-linecap", "round")
                 .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
                 .attr("d", (d: any) => getLine(d.series));
-
-            console.log(data)
-
         }
     }, [width, height, data, svgRef, colorMode]);
 
