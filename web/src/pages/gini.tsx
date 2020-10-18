@@ -75,7 +75,6 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                     values: columns.map((k: any) => +entry[k]!),
                 };
             });
-            console.log(formatted)
             const dates = columns.map((d: any) => +d);
             const dataObject = {
                 y: "Gini index",
