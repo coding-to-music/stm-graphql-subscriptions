@@ -91,7 +91,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                     country: country,
                     series: series,
                 };
-            });
+            }).filter((entry: any) => entry.series.length > 0);
             const dates = columns.map((d: any) => +d);
             const values = formatted
                 .map((entry: any) => entry.series.map((year: any) => year.value))
@@ -176,31 +176,32 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 setHoverInfo(undefined)
             };
 
-            // xm: date, ym: giniIndex, i: index, s: data object
+            // xm: date, ym: giniIndex, i: year index, s: data object
             const moved = (event: any) => {
                 event.preventDefault();
                 const cursorPosition = pointer(event, this);
                 const xm = x.invert(cursorPosition[0]);
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
-                const s = least(data.data, (d: any) => Math.abs(d.series[i] - ym));
+                // const s = least(data.data, (d: any) => Math.abs(d.series[i] - ym));
+                console.log(data.data)
 
-                svg
-                    .selectAll(".line")
-                    .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
-                    .filter((d: any) => d === s)
-                    .raise();
-                dot.attr(
-                    "transform",
-                    `translate(${x(data.dates[i])},${y(s.values[i])})`
-                ).attr("fill", highlightColor[colorMode]);
-                dot.select("text").style('fill', color[colorMode])
+                // svg
+                //     .selectAll(".line")
+                //     .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
+                //     .filter((d: any) => d === s)
+                //     .raise();
+                // dot.attr(
+                //     "transform",
+                //     `translate(${x(data.dates[i])},${y(s.values[i])})`
+                // ).attr("fill", highlightColor[colorMode]);
+                // dot.select("text").style('fill', color[colorMode])
                 // .text(s.name);
-                setHoverInfo({
-                    text: s.name,
-                    x: x(data.dates[i]) + margin.left + margin.right,
-                    y: y(s.values[i]) + margin.top + margin.bottom
-                })
+                // setHoverInfo({
+                //     text: s.name,
+                //     x: x(data.dates[i]) + margin.left + margin.right,
+                //     y: y(s.values[i]) + margin.top + margin.bottom
+                // })
             };
 
             const rect = (g: any) =>
