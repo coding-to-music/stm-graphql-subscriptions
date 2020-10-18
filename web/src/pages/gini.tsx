@@ -81,7 +81,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 series: formatted,
                 dates: dates,
             };
-            // // console.log(dataObject.series[0].values);
+            console.log(dataObject);
             setData(dataObject);
         }
     }, [rawData]);
@@ -152,7 +152,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 setHoverInfo(undefined)
             };
 
-            // xm: date, ym: giniIndex, i: index, s: data object
+            // xm: date, ym: giniIndex, i: year index, s: data object
             const moved = (event: any) => {
                 event.preventDefault();
                 const cursorPosition = pointer(event, this);
