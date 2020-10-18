@@ -14,7 +14,6 @@ import {
     axisLeft,
     scaleLinear,
     csvParse,
-    max,
     extent,
     pointer,
     bisectCenter,
@@ -24,9 +23,11 @@ import {
 import { useGetViewport } from "../utils/useGetViewport";
 
 interface Data {
-    dates: [];
-    series: [];
     y: string
+    dates: [];
+    data: [];
+    max: number;
+    min: number;
 }
 
 interface HoverInfo {
@@ -70,17 +71,39 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const parsed = csvParse(rawData!);
             const columns = parsed.columns.slice(1);
             const formatted = parsed.map((entry: any) => {
+                const strings = Object.entries(entry)
+                    .map((info) => ({
+                        [info[0]]: info[1],
+                    }))
+                    .filter((obj) => !Object.values(obj).includes(""));
+                const country = strings.filter((obj) => "country" in obj)[0].country;
+                const series = strings
+                    .filter((obj) => !("country" in obj))
+                    .map((obj: object) => {
+                        const year = +Object.keys(obj)[0];
+                        const value = +Object.values(obj)[0];
+                        return {
+                            year: year,
+                            value: value,
+                        };
+                    });
                 return {
-                    name: entry.country!,
-                    values: columns.map((k: any) => +entry[k]!),
+                    country: country,
+                    series: series,
                 };
             });
-            console.log(formatted)
             const dates = columns.map((d: any) => +d);
+            const values = formatted
+                .map((entry: any) => entry.series.map((year: any) => year.value))
+                .reduce((acc: any, cur: any) => acc.concat(cur), []);
+            const min = Math.min(...values);
+            const max = Math.max(...values);
             const dataObject = {
                 y: "Gini index",
-                series: formatted,
+                data: formatted,
                 dates: dates,
+                max: max,
+                min: min
             };
             // // console.log(dataObject.series[0].values);
             setData(dataObject);
@@ -98,7 +121,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .range([margin.left, width - margin.right]);
 
             const y = scaleLinear()
-                .domain([0, max(data.series, (d: any) => max(d.values))])
+                .domain([0, data.max])
                 .nice()
                 .range([height - margin.bottom, margin.top]);
 
@@ -160,7 +183,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const xm = x.invert(cursorPosition[0]);
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
-                const s = least(data.series, (d: any) => Math.abs(d.values[i] - ym));
+                const s = least(data.data, (d: any) => Math.abs(d.series[i] - ym));
 
                 svg
                     .selectAll(".line")
@@ -195,13 +218,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             svg.append("g").call(rect);
 
             const getLine = line()
-                .x((_: any, i: any) => x(data.dates[i]))
-                .defined((d: any) => d !== 0)
-                .y((d: any) => y(d))
+                .x((d: any) => x(d.year))
+                .y((d: any) => y(d.value))
 
             svg
                 .selectAll(".line")
-                .data(data.series)
+                .data(data.data)
                 .join("path")
                 .attr("class", "line")
                 .attr("fill", "none")
@@ -210,7 +232,9 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .attr("stroke-linejoin", "round")
                 .attr("stroke-linecap", "round")
                 .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
-                .attr("d", (d: any) => getLine(d.values));
+                .attr("d", (d: any) => getLine(d.series));
+
+            console.log(data)
 
         }
     }, [width, height, data, svgRef, colorMode]);
