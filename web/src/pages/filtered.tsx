@@ -184,7 +184,6 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
                 // const s = least(data.data, (d: any) => Math.abs(d.series[i] - ym));
-                console.log(data.data)
 
                 // svg
                 //     .selectAll(".line")
