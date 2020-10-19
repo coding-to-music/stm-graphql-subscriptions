@@ -22,6 +22,7 @@ import {
     curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
+import { range } from "d3";
 
 interface Data {
     y: string
@@ -62,6 +63,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
 
     const [filter, setFilter] = useState<Array<string> | undefined>();
+    const [range, setRange] = useState({ min: null, max: null })
 
     const handleSetFilter = (event: any) => {
         const value = event.target.value;
@@ -72,6 +74,11 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             setFilter(selectedCountries);
         }
     };
+
+    const handleSetRange = (event: any) => {
+        const { name, value } = event.target;
+        setRange((prevState) => ({ ...prevState, [name]: value }));
+    }
 
     useEffect(() => {
         fetch("./giniIndex.csv")
@@ -114,7 +121,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const max = Math.max(...values);
             const dataObject = {
                 y: "Gini index",
-                countries: formatted,
+                countries: formatted.filter((entry: any) => range.min ? entry.series[entry.series.length - 1].value > range.min : true).filter((entry: any) => range.max ? entry.series[entry.series.length - 1].value < range.max : true),
                 dates: dates,
                 max: max,
                 min: min,
@@ -122,7 +129,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             // // console.log(dataObject.series[0].values);
             setData(dataObject);
         }
-    }, [rawData]);
+    }, [rawData, range]);
 
     useEffect(() => {
         const margin = { top: 20, right: 20, bottom: 30, left: 30 };
@@ -236,7 +243,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const getLine = line()
                 .x((d: any) => x(d.year))
                 .y((d: any) => y(d.value))
-                .curve(curveCardinal);
+            // .curve(curveCardinal);
 
             svg
                 .selectAll(".line")
@@ -291,14 +298,46 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                             <Box m={2}>Filter Countries</Box>
                             <Box m={2}>
                                 <Input
+
                                     onChange={handleSetFilter}
                                     placeholder="Canada, United States,"
                                     size="md"
                                 />
                             </Box>
-                            {filter ? filter.map((entry, index) => (
-                                <Box key={index}>{entry}</Box>
-                            )) : null}
+                            <Box m={2}>Range</Box>
+
+                            <Flex justifyContent="center" alignItems="center">
+                                <Box mr={2}>
+                                    <Input
+                                        type="number"
+                                        name="min"
+                                        value={range.min}
+                                        onChange={handleSetRange}
+                                        size="sm"
+                                        w={12}
+                                    />
+                                </Box>
+                                <Box>to</Box>
+                                <Box ml={2}>
+                                    <Input
+                                        type="number"
+                                        name="max"
+                                        value={range.max}
+                                        onChange={handleSetRange}
+                                        size="sm"
+                                        w={12}
+                                    />
+                                </Box>
+                            </Flex>
+                            <Flex justifyContent="center">
+                                <Box m={2}>Min</Box>
+                                <Box m={2}>Max</Box>
+                            </Flex>
+                            <Box m={2}>
+                                {filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())).map((entry, index) => (
+                                    <Box key={index}>{entry.country}</Box>
+                                )) : null}
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
