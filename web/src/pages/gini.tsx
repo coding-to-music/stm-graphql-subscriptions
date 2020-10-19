@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
-import { Box, Link, Icon, useColorMode } from "@chakra-ui/core";
+import { Box, Flex, Text, Input, Link, Icon, useColorMode } from "@chakra-ui/core";
 import colors from "@chakra-ui/core/dist/theme/colors";
 // import {
 //   hexToRgb as rgb,
@@ -19,6 +19,7 @@ import {
     bisectCenter,
     least,
     format,
+    curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
 
@@ -53,12 +54,24 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const linkColor = { light: 'purple.500', dark: 'purple.200' }
 
     const { width: viewportWidth, height: viewportHeight } = useGetViewport();
-    const width = viewportWidth * 0.8;
-    const height = viewportHeight * 0.8;
+    const width = viewportWidth * 0.7;
+    const height = viewportHeight * 0.7;
     const [rawData, setRawData] = useState<string | undefined>();
     const [data, setData] = useState<Data | undefined>();
     const svgRef = useRef<SVGSVGElement>(null);
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
+
+    const [filter, setFilter] = useState<Array<string> | undefined>();
+
+    const handleSetFilter = (event: any) => {
+        const value = event.target.value;
+        const selectedCountries = value.replace(/,\s/g, ",").split(",").map((country: any) => country.toLowerCase());
+        if (value === "") {
+            setFilter(undefined);
+        } else {
+            setFilter(selectedCountries);
+        }
+    };
 
     useEffect(() => {
         fetch("./giniIndex.csv")
@@ -184,7 +197,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const xm = x.invert(cursorPosition[0]);
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
-                const s = least(data.countries, (d: any) => Math.abs(+d.indexed[i] - ym));
+                const s = least((filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())) : data.countries), (d: any) => Math.abs(+d.indexed[i] - ym));
 
                 if (s !== undefined && s.indexed[i] > 0) {
                     svg
@@ -223,10 +236,11 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const getLine = line()
                 .x((d: any) => x(d.year))
                 .y((d: any) => y(d.value))
+                .curve(curveCardinal);
 
             svg
                 .selectAll(".line")
-                .data(data.countries)
+                .data(filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())) : data.countries)
                 .join("path")
                 .attr("class", "line")
                 .attr("fill", "none")
@@ -237,28 +251,58 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
                 .attr("d", (d: any) => getLine(d.series));
         }
-    }, [width, height, data, svgRef, colorMode]);
+    }, [width, height, data, svgRef, colorMode, filter]);
 
     return (
         <Layout defaultColor={defaultColor}>
-            <Box mb={2} >
-                <Link color={linkColor[colorMode]} href="https://data.worldbank.org/indicator/SI.POV.GINI" isExternal>
-                    World Bank Estimate<Icon name="external-link" mx="2px" />
-                </Link>
-            </Box>
-            <Box
-                backgroundColor={bgColor[colorMode]}
-                border="1px solid"
-                borderColor={bordColor[colorMode]}
-            >
-                <svg ref={svgRef} overflow="visible">
-                    <g className="xAxis" />
-                    <g className="yAxis" />
-                </svg>
-                {hoverInfo ? (
-                    <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>{hoverInfo!.text}</Box>
-                ) : null}
-            </Box>
+            <Flex>
+                <Box>
+                    <Box mb={2} >
+                        <Link color={linkColor[colorMode]} href="https://data.worldbank.org/indicator/SI.POV.GINI" isExternal>
+                            World Bank Estimate<Icon name="external-link" mx="2px" />
+                        </Link>
+                    </Box>
+                    <Box
+                        backgroundColor={bgColor[colorMode]}
+                        border="1px solid"
+                        borderColor={bordColor[colorMode]}
+                    >
+                        <svg ref={svgRef} overflow="visible">
+                            <g className="xAxis" />
+                            <g className="yAxis" />
+                        </svg>
+                        {hoverInfo ? (
+                            <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>{hoverInfo!.text}</Box>
+                        ) : null}
+                    </Box>
+                </Box>
+                <Box ml={2}>
+                    <Box mb={2}>
+                        <Text
+                            color={linkColor[colorMode]}
+                        >Filters</Text>
+                    </Box>
+                    <Box
+                        backgroundColor={bgColor[colorMode]}
+                        border="1px solid"
+                        borderColor={bordColor[colorMode]}
+                    >
+                        <Box>
+                            <Box m={2}>Filter Countries</Box>
+                            <Box m={2}>
+                                <Input
+                                    onChange={handleSetFilter}
+                                    placeholder="Canada, United States,"
+                                    size="md"
+                                />
+                            </Box>
+                            {filter ? filter.map((entry, index) => (
+                                <Box key={index}>{entry}</Box>
+                            )) : null}
+                        </Box>
+                    </Box>
+                </Box>
+            </Flex>
 
         </Layout >
     )
