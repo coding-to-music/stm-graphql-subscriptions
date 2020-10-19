@@ -186,22 +186,24 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const i = bisectCenter(data.dates, xm);
                 const s = least(data.countries, (d: any) => Math.abs(+d.indexed[i] - ym));
 
-                svg
-                    .selectAll(".line")
-                    .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
-                    .filter((d: any) => d === s)
-                    .raise();
-                // dot.attr(
-                //     "transform",
-                //     `translate(${x(data.dates[i])},${y(+s.indexed[i])})`
-                // ).attr("fill", highlightColor[colorMode]);
-                // dot.select("text").style('fill', color[colorMode])
-                //     .text(s.name);
-                // setHoverInfo({
-                //     text: s.name,
-                //     x: x(data.dates[i]) + margin.left + margin.right,
-                //     y: y(s.indexed[i]) + margin.top + margin.bottom
-                // })
+                if (s !== undefined) {
+                    svg
+                        .selectAll(".line")
+                        .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
+                        .filter((d: any) => d === s)
+                        .raise();
+                    dot.attr(
+                        "transform",
+                        `translate(${x(data.dates[i])},${y(+s.indexed[i])})`
+                    ).attr("fill", highlightColor[colorMode]);
+                    dot.select("text").style('fill', color[colorMode])
+                    // .text(s.country);
+                    setHoverInfo({
+                        text: s.country,
+                        x: x(data.dates[i]) + margin.left + margin.right,
+                        y: y(s.indexed[i]) + margin.top + margin.bottom
+                    })
+                }
             };
 
             const rect = (g: any) =>
