@@ -186,7 +186,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const i = bisectCenter(data.dates, xm);
                 const s = least(data.countries, (d: any) => Math.abs(+d.indexed[i] - ym));
 
-                if (s !== undefined) {
+                if (s !== undefined && s.indexed[i] > 0) {
                     svg
                         .selectAll(".line")
                         .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
