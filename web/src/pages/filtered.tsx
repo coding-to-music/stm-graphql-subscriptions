@@ -25,7 +25,7 @@ import { useGetViewport } from "../utils/useGetViewport";
 interface Data {
     y: string
     dates: [];
-    data: [];
+    countries: [];
     max: number;
     min: number;
 }
@@ -69,30 +69,31 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     useEffect(() => {
         if (rawData) {
             const parsed = csvParse(rawData!);
-            const columns = parsed.columns.slice(1);
-            const formatted = parsed.map((entry: any) => {
-                const strings = Object.entries(entry)
-                    .map((info) => ({
-                        [info[0]]: info[1],
-                    }))
-                    .filter((obj) => !Object.values(obj).includes(""));
-                const country = strings.filter((obj) => "country" in obj)[0].country;
-                const series = strings
-                    .filter((obj) => !("country" in obj))
-                    .map((obj: object) => {
-                        const year = +Object.keys(obj)[0];
-                        const value = +Object.values(obj)[0];
-                        return {
-                            year: year,
-                            value: value,
-                        };
-                    });
-                return {
-                    country: country,
-                    series: series,
-                };
-            }).filter((entry: any) => entry.series.length > 0);
-            const dates = columns.map((d: any) => +d);
+            const dates = parsed.columns.slice(1).map((d: any) => +d);
+            const formatted = parsed
+                .map((entry: any) => {
+                    const indexed = Object.values(entry).slice(0, dates.length - 1);
+                    const strings = Object.entries(entry)
+                        .map((info) => ({
+                            [info[0]]: info[1],
+                        }))
+                        .filter((obj) => !Object.values(obj).includes(""));
+                    const country = strings.filter((obj) => "country" in obj)[0].country;
+                    const series = strings
+                        .filter((obj) => !("country" in obj))
+                        .map((obj: object) => {
+                            return {
+                                year: +Object.keys(obj)[0],
+                                value: +Object.values(obj)[0],
+                            };
+                        });
+                    return {
+                        country: country,
+                        indexed: indexed,
+                        series: series,
+                    };
+                })
+                .filter((entry: any) => entry.series.length > 0);
             const values = formatted
                 .map((entry: any) => entry.series.map((year: any) => year.value))
                 .reduce((acc: any, cur: any) => acc.concat(cur), []);
@@ -100,10 +101,10 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const max = Math.max(...values);
             const dataObject = {
                 y: "Gini index",
-                data: formatted,
+                countries: formatted,
                 dates: dates,
                 max: max,
-                min: min
+                min: min,
             };
             // // console.log(dataObject.series[0].values);
             setData(dataObject);
@@ -183,23 +184,23 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const xm = x.invert(cursorPosition[0]);
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
-                // const s = least(data.data, (d: any) => Math.abs(d.series[i] - ym));
+                const s = least(data.countries, (d: any) => Math.abs(+d.indexed[i] - ym));
 
-                // svg
-                //     .selectAll(".line")
-                //     .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
-                //     .filter((d: any) => d === s)
-                //     .raise();
+                svg
+                    .selectAll(".line")
+                    .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
+                    .filter((d: any) => d === s)
+                    .raise();
                 // dot.attr(
                 //     "transform",
-                //     `translate(${x(data.dates[i])},${y(s.values[i])})`
+                //     `translate(${x(data.dates[i])},${y(+s.indexed[i])})`
                 // ).attr("fill", highlightColor[colorMode]);
                 // dot.select("text").style('fill', color[colorMode])
-                // .text(s.name);
+                //     .text(s.name);
                 // setHoverInfo({
                 //     text: s.name,
                 //     x: x(data.dates[i]) + margin.left + margin.right,
-                //     y: y(s.values[i]) + margin.top + margin.bottom
+                //     y: y(s.indexed[i]) + margin.top + margin.bottom
                 // })
             };
 
@@ -223,7 +224,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
             svg
                 .selectAll(".line")
-                .data(data.data)
+                .data(data.countries)
                 .join("path")
                 .attr("class", "line")
                 .attr("fill", "none")
