@@ -19,14 +19,20 @@ import {
     bisectCenter,
     least,
     format,
-    curveCardinal
+    // curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
+
+interface Country {
+    country: string,
+    indexed: [],
+    series: {},
+}
 
 interface Data {
     y: string
     dates: [];
-    countries: [];
+    countries: [Country];
     max: number;
     min: number;
 }
@@ -62,7 +68,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
 
     const [filter, setFilter] = useState<Array<string> | undefined>();
-    const [range, setRange] = useState({ min: null, max: null })
+    const [range, setRange] = useState({ min: undefined, max: undefined })
 
     const handleSetFilter = (event: any) => {
         const value = event.target.value;
@@ -118,8 +124,15 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .reduce((acc: any, cur: any) => acc.concat(cur), []);
             const min = Math.min(...values);
             const max = Math.max(...values);
-            const rangeFiltered = formatted.filter((entry: any) => range.min ? entry.series[entry.series.length - 1].value > range.min : true).filter((entry: any) => range.max ? entry.series[entry.series.length - 1].value < range.max : true)
-            const nameFiltered = filter ? rangeFiltered.filter((entry: any) => filter.includes(entry.country.toLowerCase())) : rangeFiltered
+            const rangeFiltered = formatted.filter((entry: any) => range.min
+                ? entry.series[entry.series.length - 1].value > range.min!
+                : true)
+                .filter((entry: any) => range.max
+                    ? entry.series[entry.series.length - 1].value < range.max!
+                    : true)
+            const nameFiltered = filter
+                ? rangeFiltered.filter((entry: any) => filter.includes(entry.country.toLowerCase()))
+                : rangeFiltered
             const dataObject = {
                 y: "Gini index",
                 countries: nameFiltered,
@@ -335,7 +348,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                                 <Box m={2}>Max</Box>
                             </Flex>
                             <Box m={2}>
-                                {filter || range.min || range.max ? data.countries.map((entry, index) => (
+                                {data ? data.countries.map((entry: any, index: any) => (
                                     <Box key={index}>{entry.country}</Box>
                                 )) : null}
                             </Box>
