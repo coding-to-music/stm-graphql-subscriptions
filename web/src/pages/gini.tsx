@@ -22,7 +22,6 @@ import {
     curveCardinal
 } from "d3";
 import { useGetViewport } from "../utils/useGetViewport";
-import { range } from "d3";
 
 interface Data {
     y: string
@@ -119,9 +118,11 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .reduce((acc: any, cur: any) => acc.concat(cur), []);
             const min = Math.min(...values);
             const max = Math.max(...values);
+            const rangeFiltered = formatted.filter((entry: any) => range.min ? entry.series[entry.series.length - 1].value > range.min : true).filter((entry: any) => range.max ? entry.series[entry.series.length - 1].value < range.max : true)
+            const nameFiltered = filter ? rangeFiltered.filter((entry: any) => filter.includes(entry.country.toLowerCase())) : rangeFiltered
             const dataObject = {
                 y: "Gini index",
-                countries: formatted.filter((entry: any) => range.min ? entry.series[entry.series.length - 1].value > range.min : true).filter((entry: any) => range.max ? entry.series[entry.series.length - 1].value < range.max : true),
+                countries: nameFiltered,
                 dates: dates,
                 max: max,
                 min: min,
@@ -129,7 +130,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             // // console.log(dataObject.series[0].values);
             setData(dataObject);
         }
-    }, [rawData, range]);
+    }, [rawData, filter, range]);
 
     useEffect(() => {
         const margin = { top: 20, right: 20, bottom: 30, left: 30 };
@@ -204,7 +205,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 const xm = x.invert(cursorPosition[0]);
                 const ym = y.invert(cursorPosition[1]);
                 const i = bisectCenter(data.dates, xm);
-                const s = least((filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())) : data.countries), (d: any) => Math.abs(+d.indexed[i] - ym));
+                const s = least((data.countries), (d: any) => Math.abs(+d.indexed[i] - ym));
 
                 if (s !== undefined && s.indexed[i] > 0) {
                     svg
@@ -247,7 +248,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
             svg
                 .selectAll(".line")
-                .data(filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())) : data.countries)
+                .data(data.countries)
                 .join("path")
                 .attr("class", "line")
                 .attr("fill", "none")
@@ -258,7 +259,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
                 .attr("d", (d: any) => getLine(d.series));
         }
-    }, [width, height, data, svgRef, colorMode, filter]);
+    }, [width, height, data, svgRef, colorMode]);
 
     return (
         <Layout defaultColor={defaultColor}>
@@ -334,7 +335,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                                 <Box m={2}>Max</Box>
                             </Flex>
                             <Box m={2}>
-                                {filter ? data.countries.filter(entry => filter.includes(entry.country.toLowerCase())).map((entry, index) => (
+                                {filter || range.min || range.max ? data.countries.map((entry, index) => (
                                     <Box key={index}>{entry.country}</Box>
                                 )) : null}
                             </Box>
