@@ -125,10 +125,10 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
             const min = Math.min(...values);
             const max = Math.max(...values);
             const rangeFiltered = formatted.filter((entry: any) => range.min
-                ? entry.series[entry.series.length - 1].value > range.min!
+                ? entry.series[entry.series.length - 1].value >= range.min!
                 : true)
                 .filter((entry: any) => range.max
-                    ? entry.series[entry.series.length - 1].value < range.max!
+                    ? entry.series[entry.series.length - 1].value <= range.max!
                     : true)
             const nameFiltered = filter
                 ? rangeFiltered.filter((entry: any) => filter.includes(entry.country.toLowerCase()))
