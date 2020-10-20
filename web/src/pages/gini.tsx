@@ -307,8 +307,9 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                         backgroundColor={bgColor[colorMode]}
                         border="1px solid"
                         borderColor={bordColor[colorMode]}
+                        h="70vh"
                     >
-                        <Box>
+                        <Box h="100%">
                             <Box m={2}>Filter Countries</Box>
                             <Box m={2}>
                                 <Input
@@ -347,7 +348,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                                 <Box m={2}>Min</Box>
                                 <Box m={2}>Max</Box>
                             </Flex>
-                            <Box m={2}>
+                            <Box m={2} height="75%" overflow="scroll">
                                 {data ? data.countries.map((entry: any, index: any) => (
                                     <Box key={index}>{entry.country}</Box>
                                 )) : null}
