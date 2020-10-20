@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { withApollo } from "../utils/withApollo";
 import { Layout } from "../components/Layout";
-import { Box, Flex, Text, Input, Link, Icon, useColorMode } from "@chakra-ui/core";
+import { Box, Flex, Text, Input, Link, Icon, PseudoBox, useColorMode } from "@chakra-ui/core";
 import colors from "@chakra-ui/core/dist/theme/colors";
 // import {
 //   hexToRgb as rgb,
@@ -51,11 +51,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.50", dark: "gray.900" };
     const color = { light: "black", dark: "white" };
-    // const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
+    const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
     const bordColor = { light: "gray.200", dark: "rgba(255,255,255,0.04)" };
     const chartColor = { light: colors.purple[200], dark: colors.purple[600] };
     const highlightColor = { light: colors.purple[600], dark: colors.purple[300] }
     const muteColor = { light: colors.purple[100], dark: colors.purple[900] }
+    const scrollbar = { light: 'scrollbarLight', dark: 'scrollbarDark' }
 
     const linkColor = { light: 'purple.500', dark: 'purple.200' }
 
@@ -348,9 +349,12 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                                 <Box m={2}>Min</Box>
                                 <Box m={2}>Max</Box>
                             </Flex>
-                            <Box m={2} height="75%" overflow="scroll">
+                            <Box m={2} height="75%" overflowY="scroll" className={scrollbar[colorMode]}>
                                 {data ? data.countries.map((entry: any, index: any) => (
-                                    <Box key={index}>{entry.country}</Box>
+                                    <Box key={index}><PseudoBox as="button"
+                                        _hover={{ bg: `${highlightColor[colorMode]}`, color: 'white' }}>
+                                        {entry.country}
+                                    </PseudoBox></Box>
                                 )) : null}
                             </Box>
                         </Box>
