@@ -51,7 +51,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
     const { colorMode } = useColorMode();
     const bgColor = { light: "gray.50", dark: "gray.900" };
     const color = { light: "black", dark: "white" };
-    const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
+    // const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
     const bordColor = { light: "gray.200", dark: "rgba(255,255,255,0.04)" };
     const chartColor = { light: colors.purple[200], dark: colors.purple[600] };
     const highlightColor = { light: colors.purple[600], dark: colors.purple[300] }
@@ -70,6 +70,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
     const [filter, setFilter] = useState<Array<string> | undefined>();
     const [range, setRange] = useState({ min: undefined, max: undefined })
+    const [listHover, setListHover] = useState<string | undefined>()
 
     const handleSetFilter = (event: any) => {
         const value = event.target.value;
@@ -260,20 +261,34 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .y((d: any) => y(d.value))
             // .curve(curveCardinal);
 
+            const getColor = (d: any) => {
+                if (listHover) {
+                    return d.country === listHover ? highlightColor[colorMode] : muteColor[colorMode]
+                }
+                return chartColor[colorMode]
+            }
+
+            const getBlendMode = () => {
+                if (listHover) {
+                    return null
+                }
+                return colorMode === 'dark' ? "screen" : "multiply"
+            }
+
             svg
                 .selectAll(".line")
                 .data(data.countries)
                 .join("path")
                 .attr("class", "line")
                 .attr("fill", "none")
-                .attr("stroke", chartColor[colorMode])
+                .attr("stroke", (d: any) => getColor(d))
                 .attr("stroke-width", 1.5)
                 .attr("stroke-linejoin", "round")
                 .attr("stroke-linecap", "round")
-                .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
+                .style("mix-blend-mode", getBlendMode())
                 .attr("d", (d: any) => getLine(d.series));
         }
-    }, [width, height, data, svgRef, colorMode]);
+    }, [width, height, data, svgRef, colorMode, listHover]);
 
     return (
         <Layout defaultColor={defaultColor}>
@@ -352,7 +367,10 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                             <Box m={2} height="75%" overflowY="scroll" className={scrollbar[colorMode]}>
                                 {data ? data.countries.map((entry: any, index: any) => (
                                     <Box key={index}><PseudoBox as="button"
-                                        _hover={{ bg: `${highlightColor[colorMode]}`, color: 'white' }}>
+                                        _hover={{ bg: `${highlightColor[colorMode]}`, color: 'white' }}
+                                        onMouseEnter={() => setListHover(entry.country)}
+                                        onMouseLeave={() => setListHover(undefined)}
+                                    >
                                         {entry.country}
                                     </PseudoBox></Box>
                                 )) : null}
