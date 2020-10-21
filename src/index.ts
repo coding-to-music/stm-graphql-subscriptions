@@ -31,6 +31,8 @@ import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { PositionsResolver } from "./resolvers/positions";
 import { useGetPositions } from "./utils/useGetPositions";
 
+const PORT = process.env.PORT || 4000;
+
 const main = async () => {
   const conn = await createConnection({
     type: "postgres",
@@ -135,7 +137,7 @@ const main = async () => {
   apolloServer.applyMiddleware({ app, cors: false });
   const httpServer = http.createServer(app);
   apolloServer.installSubscriptionHandlers(httpServer);
-  httpServer.listen(4000, () => {
+  httpServer.listen(PORT, () => {
     console.log("server started on localhost:4000");
   });
 
