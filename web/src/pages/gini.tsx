@@ -39,6 +39,7 @@ interface Data {
 
 interface HoverInfo {
     text: string;
+    value: string;
     x: number;
     y: number;
 }
@@ -236,6 +237,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                     // .text(s.country);
                     setHoverInfo({
                         text: s.country,
+                        value: s.indexed[i],
                         x: x(data.dates[i]) + margin.left + margin.right,
                         y: y(s.indexed[i]) + margin.top + margin.bottom
                     })
@@ -326,7 +328,10 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                             <g className="yAxis" />
                         </svg>
                         {hoverInfo ? (
-                            <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>{hoverInfo!.text}</Box>
+                            <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>
+                                <p>{hoverInfo!.text}</p>
+                                <p>{hoverInfo!.value}</p>
+                            </Box>
                         ) : null}
                     </Box>
                 </Box>
