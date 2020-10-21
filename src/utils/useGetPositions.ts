@@ -1,45 +1,45 @@
 const fetch = require("node-fetch");
 const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
 import { APIKEY, REDIS_URL } from "../constants";
-import { promises as fs } from "fs";
+// import { promises as fs } from "fs";
 import { feedParser } from "./feedParser";
 import Redis from "ioredis";
 
-const mockData = async () => {
-  const date = new Date();
-  const currentTime = date.getTime() / 1000;
-  const file = await fs.readFile("./feed.json", "utf-8");
-  const data = JSON.parse(file);
-  data.timestamp = currentTime;
-  const feed = data.feed.map((vehicle: any) => {
-    const id = vehicle.id;
-    const tripId = vehicle.tripId;
-    const routeId = vehicle.routeId;
-    const latitude =
-      vehicle.position.latitude +
-      (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
-    const longitude =
-      vehicle.position.longitude +
-      (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
-    const vehicleTimestamp = currentTime;
-    const vehicleId = vehicle.id;
-    return {
-      id: id,
-      tripId: tripId,
-      routeId: routeId,
-      position: {
-        latitude: latitude,
-        longitude: longitude,
-      },
-      timestamp: vehicleTimestamp,
-      vehicleId: vehicleId,
-    };
-  });
-  data.feed = feed;
-  const time = date.toLocaleTimeString();
-  console.log(`mock data: ${data.count} vehicles, ${time}`);
-  return data;
-};
+// const mockData = async () => {
+//   const date = new Date();
+//   const currentTime = date.getTime() / 1000;
+//   const file = await fs.readFile("./feed.json", "utf-8");
+//   const data = JSON.parse(file);
+//   data.timestamp = currentTime;
+//   const feed = data.feed.map((vehicle: any) => {
+//     const id = vehicle.id;
+//     const tripId = vehicle.tripId;
+//     const routeId = vehicle.routeId;
+//     const latitude =
+//       vehicle.position.latitude +
+//       (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
+//     const longitude =
+//       vehicle.position.longitude +
+//       (Math.random() > 0.5 ? Math.random() / 1000 : -Math.random() / 1000);
+//     const vehicleTimestamp = currentTime;
+//     const vehicleId = vehicle.id;
+//     return {
+//       id: id,
+//       tripId: tripId,
+//       routeId: routeId,
+//       position: {
+//         latitude: latitude,
+//         longitude: longitude,
+//       },
+//       timestamp: vehicleTimestamp,
+//       vehicleId: vehicleId,
+//     };
+//   });
+//   data.feed = feed;
+//   const time = date.toLocaleTimeString();
+//   console.log(`mock data: ${data.count} vehicles, ${time}`);
+//   return data;
+// };
 
 const redis = new Redis(REDIS_URL);
 

@@ -7,6 +7,7 @@ import {
   DBNAME,
   REDIS_URL,
   DATABASE_URL,
+  CLIENT_ORIGIN,
 } from "./constants";
 import path from "path";
 import http from "http";
@@ -52,7 +53,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: CLIENT_ORIGIN,
       credentials: true,
     })
   );
@@ -79,7 +80,7 @@ const main = async () => {
     publisher: new Redis(REDIS_URL),
     subscriber: new Redis(REDIS_URL),
   });
-  app.use((req: any, res: any, next: any) => {
+  app.use((req: any, _, next: any) => {
     req.pubsub = pubsub;
     next();
   });
@@ -108,14 +109,13 @@ const main = async () => {
       };
     },
     subscriptions: {
-      async onConnect(connectionParams, webSocket: any) {
+      async onConnect(_, webSocket: any) {
         console.log(
           "connected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
         await redis.incr("subscribers");
-        const subs = await redis.get("subscribers");
-        const subscribers = parseInt(subs);
+        const subscribers = await +redis.get("subscribers");
         console.log("subscribers: ", subscribers);
       },
       async onDisconnect(webSocket: any) {
@@ -123,8 +123,7 @@ const main = async () => {
           "disconnected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        const subs = await redis.get("subscribers");
-        let subscribers = parseInt(subs);
+        let subscribers = await +redis.get("subscribers");
         if (subscribers > 0) {
           await redis.decr("subscribers");
           subscribers--;
@@ -141,7 +140,7 @@ const main = async () => {
   });
 
   setInterval(async () => {
-    const subscribers = await redis.get("subscribers");
+    const subscribers = await +redis.get("subscribers");
     if (subscribers > 0) {
       const feed = await useGetPositions();
       await redis.set("positions", JSON.stringify(feed));
