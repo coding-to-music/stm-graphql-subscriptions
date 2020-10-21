@@ -261,34 +261,51 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
                 .y((d: any) => y(d.value))
             // .curve(curveCardinal);
 
-            const getColor = (d: any) => {
-                if (listHover) {
-                    return d.country === listHover ? highlightColor[colorMode] : muteColor[colorMode]
-                }
-                return chartColor[colorMode]
-            }
+            if (listHover) {
+                svg
+                    .selectAll(".line")
+                    .data(data.countries.filter(entry => entry.country !== listHover))
+                    .join("path")
+                    .attr("class", "line")
+                    .attr("fill", "none")
+                    .attr("stroke", muteColor[colorMode])
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .style("mix-blend-mode", null)
+                    .attr("d", (d: any) => getLine(d.series));
 
-            const getBlendMode = () => {
-                if (listHover) {
-                    return null
-                }
-                return colorMode === 'dark' ? "screen" : "multiply"
-            }
+                svg
+                    .selectAll(".highlighted")
+                    .data(data.countries.filter(entry => entry.country === listHover))
+                    .join("path")
+                    .attr("class", "highlighted")
+                    .attr("fill", "none")
+                    .attr("stroke", highlightColor[colorMode])
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .style("mix-blend-mode", null)
+                    .attr("d", (d: any) => getLine(d.series))
+                    .raise();
 
-            svg
-                .selectAll(".line")
-                .data(data.countries)
-                .join("path")
-                .attr("class", "line")
-                .attr("fill", "none")
-                .attr("stroke", (d: any) => getColor(d))
-                .attr("stroke-width", 1.5)
-                .attr("stroke-linejoin", "round")
-                .attr("stroke-linecap", "round")
-                .style("mix-blend-mode", getBlendMode())
-                .attr("d", (d: any) => getLine(d.series));
+            } else {
+                svg.selectAll(".highlighted").remove();
+                svg
+                    .selectAll(".line")
+                    .data(data.countries)
+                    .join("path")
+                    .attr("class", "line")
+                    .attr("fill", "none")
+                    .attr("stroke", chartColor[colorMode])
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round")
+                    .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
+                    .attr("d", (d: any) => getLine(d.series));
+            }
         }
-    }, [width, height, data, svgRef, colorMode, listHover]);
+    }, [width, height, data, svgRef, colorMode, filter, listHover]);
 
     return (
         <Layout defaultColor={defaultColor}>
