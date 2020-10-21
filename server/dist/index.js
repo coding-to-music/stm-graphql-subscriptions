@@ -37,9 +37,8 @@ const useGetPositions_1 = require("./utils/useGetPositions");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
-        database: constants_1.DBNAME,
-        username: constants_1.DBUSERNAME,
-        password: constants_1.DBPASSWORD,
+        url: constants_1.DATABASE_URL ||
+            `postgres://${constants_1.DBUSERNAME}:${constants_1.DBPASSWORD}@localhost:5432/${constants_1.DBNAME}`,
         logging: true,
         synchronize: true,
         migrations: [path_1.default.join(__dirname, "./migrations/*")],
@@ -48,7 +47,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield conn.runMigrations();
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
-    const redis = new ioredis_1.default();
+    const redis = new ioredis_1.default(constants_1.REDIS_URL);
     yield redis.flushall();
     app.use(cors_1.default({
         origin: "http://localhost:3000",
@@ -71,8 +70,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         resave: false,
     }));
     const pubsub = new graphql_redis_subscriptions_1.RedisPubSub({
-        publisher: new ioredis_1.default(),
-        subscriber: new ioredis_1.default(),
+        publisher: new ioredis_1.default(constants_1.REDIS_URL),
+        subscriber: new ioredis_1.default(constants_1.REDIS_URL),
     });
     app.use((req, res, next) => {
         req.pubsub = pubsub;

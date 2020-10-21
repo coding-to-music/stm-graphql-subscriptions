@@ -5,6 +5,8 @@ import {
   DBUSERNAME,
   DBPASSWORD,
   DBNAME,
+  REDIS_URL,
+  DATABASE_URL,
 } from "./constants";
 import path from "path";
 import http from "http";
@@ -31,9 +33,9 @@ import { useGetPositions } from "./utils/useGetPositions";
 const main = async () => {
   const conn = await createConnection({
     type: "postgres",
-    database: DBNAME,
-    username: DBUSERNAME,
-    password: DBPASSWORD,
+    url:
+      DATABASE_URL ||
+      `postgres://${DBUSERNAME}:${DBPASSWORD}@localhost:5432/${DBNAME}`,
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
@@ -45,7 +47,7 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis(REDIS_URL);
   await redis.flushall();
 
   app.use(
@@ -74,8 +76,8 @@ const main = async () => {
     })
   );
   const pubsub = new RedisPubSub({
-    publisher: new Redis(),
-    subscriber: new Redis(),
+    publisher: new Redis(REDIS_URL),
+    subscriber: new Redis(REDIS_URL),
   });
   app.use((req: any, res: any, next: any) => {
     req.pubsub = pubsub;

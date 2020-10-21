@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-import { APIKEY } from "../constants";
+import { APIKEY, REDIS_URL } from "../constants";
 import { promises as fs } from "fs";
 import { feedParser } from "./feedParser";
 import Redis from "ioredis";
@@ -41,7 +41,7 @@ const mockData = async () => {
   return data;
 };
 
-const redis = new Redis();
+const redis = new Redis(REDIS_URL);
 
 const liveData = async () => {
   const currentTime = new Date().toLocaleTimeString();

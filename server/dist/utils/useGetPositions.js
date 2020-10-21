@@ -52,7 +52,7 @@ const mockData = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`mock data: ${data.count} vehicles, ${time}`);
     return data;
 });
-const redis = new ioredis_1.default();
+const redis = new ioredis_1.default(constants_1.REDIS_URL);
 const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     const currentTime = new Date().toLocaleTimeString();
     const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
