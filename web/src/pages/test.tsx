@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex } from "@chakra-ui/core";
+import { Flex, Box } from "@chakra-ui/core";
 import { Layout } from "../components/Layout";
 import { withApollo } from "../utils/withApollo";
 
@@ -10,7 +10,9 @@ interface testProps {
 const test: React.FC<testProps> = ({ defaultColor }) => {
   return (
     <Layout defaultColor={defaultColor}>
-      <Flex alignItems="center">test</Flex>
+      <Flex alignItems="center" flexDir="column">
+        Test
+      </Flex>
     </Layout>
   );
 };
