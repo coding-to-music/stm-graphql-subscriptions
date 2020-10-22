@@ -34,6 +34,7 @@ const createUserLoader_1 = require("./utils/createUserLoader");
 const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 const positions_1 = require("./resolvers/positions");
 const useGetPositions_1 = require("./utils/useGetPositions");
+const PORT = process.env.PORT || 4000;
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -50,7 +51,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const redis = new ioredis_1.default(constants_1.REDIS_URL);
     yield redis.flushall();
     app.use(cors_1.default({
-        origin: "http://localhost:3000",
+        origin: constants_1.CLIENT_ORIGIN,
         credentials: true,
     }));
     app.use(express_session_1.default({
@@ -124,7 +125,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     apolloServer.applyMiddleware({ app, cors: false });
     const httpServer = http_1.default.createServer(app);
     apolloServer.installSubscriptionHandlers(httpServer);
-    httpServer.listen(4000, () => {
+    httpServer.listen(PORT, () => {
         console.log("server started on localhost:4000");
     });
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
