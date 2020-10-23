@@ -126,7 +126,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const httpServer = http_1.default.createServer(app);
     apolloServer.installSubscriptionHandlers(httpServer);
     httpServer.listen(PORT, () => {
-        console.log("server started on localhost:4000");
+        console.log(`"server started on localhost:${PORT}`);
     });
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         const subscribers = yield +redis.get("subscribers");

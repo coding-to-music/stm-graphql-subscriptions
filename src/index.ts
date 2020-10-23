@@ -138,7 +138,7 @@ const main = async () => {
   const httpServer = http.createServer(app);
   apolloServer.installSubscriptionHandlers(httpServer);
   httpServer.listen(PORT, () => {
-    console.log("server started on localhost:4000");
+    console.log(`"server started on localhost:${PORT}`);
   });
 
   setInterval(async () => {
