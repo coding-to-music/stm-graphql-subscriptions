@@ -17,6 +17,7 @@ const wsLink: any = process.browser
 
 const httplink = new HttpLink({
   uri: process.env.NEXT_PUBLIC_HTTP || "http://localhost:4000/graphql",
+  credentials: "include",
 });
 
 const link = process.browser
