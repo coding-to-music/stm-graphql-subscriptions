@@ -1,3 +1,15 @@
+/*
+mutation {
+  login(usernameOrEmail:"ansel", password:"ansel") {
+    user {
+      username
+      id
+      email
+    }
+  }
+}
+*/
+
 import {
   Resolver,
   Mutation,
@@ -18,7 +30,15 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { getConnection } from "typeorm";
-import cookie from "cookie-signature";
+import * as cookieJar from "cookie-signature";
+
+@ObjectType()
+class Cookie {
+  @Field()
+  name: string;
+  @Field()
+  value: string;
+}
 
 @ObjectType()
 class FieldError {
@@ -35,6 +55,9 @@ class UserResponse {
 
   @Field(() => User, { nullable: true })
   user?: User;
+
+  @Field(() => Cookie, { nullable: true })
+  cookie?: Cookie;
 }
 
 @Resolver(User)
@@ -201,11 +224,16 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
-    const signedCookie = cookie.sign(req.sessionID!, SECRET);
+    const signedCookie = cookieJar.sign(req.sessionID!, SECRET);
+    const cookie = {
+      name: COOKIE_NAME,
+      value: `s%3A${signedCookie}`,
+    };
     console.log(`${COOKIE_NAME}=s%3A${signedCookie}`);
 
     return {
       user,
+      cookie,
     };
   }
 
