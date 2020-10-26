@@ -16,5 +16,5 @@ exports.DBPASSWORD = process.env.DB_PASS;
 exports.APIKEY = process.env.APIKEY;
 exports.REDIS_URL = process.env.REDIS_URL || `127.0.0.1:6379`;
 exports.DATABASE_URL = process.env.DATABASE_URL;
-exports.CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:3000";
+exports.CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://mini.local:3000";
 //# sourceMappingURL=constants.js.map

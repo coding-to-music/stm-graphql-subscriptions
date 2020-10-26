@@ -12,12 +12,13 @@ import {
 import { MyContext } from "./types";
 import { User } from "../entities/User";
 import argon2 from "argon2";
-import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX, SECRET } from "../constants";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { getConnection } from "typeorm";
+import cookie from "cookie-signature";
 
 @ObjectType()
 class FieldError {
@@ -170,7 +171,7 @@ export class UserResolver {
   async login(
     @Arg("usernameOrEmail") usernameOrEmail: string,
     @Arg("password") password: string,
-    @Ctx() { req }: MyContext
+    @Ctx() { req, res }: MyContext
   ): Promise<UserResponse> {
     const user = await User.findOne(
       usernameOrEmail.includes("@")
@@ -200,6 +201,8 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
+    const signedCookie = cookie.sign(req.sessionID!, SECRET);
+    console.log(`${COOKIE_NAME}=s%3A${signedCookie}`);
 
     return {
       user,

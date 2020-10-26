@@ -34,6 +34,7 @@ const validateRegister_1 = require("../utils/validateRegister");
 const sendEmail_1 = require("../utils/sendEmail");
 const uuid_1 = require("uuid");
 const typeorm_1 = require("typeorm");
+const cookie_signature_1 = __importDefault(require("cookie-signature"));
 let FieldError = class FieldError {
 };
 __decorate([
@@ -165,7 +166,7 @@ let UserResolver = class UserResolver {
             return { user };
         });
     }
-    login(usernameOrEmail, password, { req }) {
+    login(usernameOrEmail, password, { req, res }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne(usernameOrEmail.includes("@")
                 ? { where: { email: usernameOrEmail } }
@@ -192,6 +193,8 @@ let UserResolver = class UserResolver {
                 };
             }
             req.session.userId = user.id;
+            const signedCookie = cookie_signature_1.default.sign(req.sessionID, constants_1.SECRET);
+            console.log(`${constants_1.COOKIE_NAME}=s%3A${signedCookie}`);
             return {
                 user,
             };
