@@ -7,7 +7,6 @@ import {
   DBNAME,
   REDIS_URL,
   DATABASE_URL,
-  CLIENT_ORIGIN,
 } from "./constants";
 import path from "path";
 import http from "http";
@@ -55,10 +54,17 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: CLIENT_ORIGIN,
+      origin: true,
       credentials: true,
     })
   );
+  app.use((req: any, _, next: any) => {
+    const token = req.headers.authorization;
+    if (token) {
+      req.headers.cookie = `${COOKIE_NAME}=${token}`;
+    }
+    next();
+  });
 
   app.use(
     session({

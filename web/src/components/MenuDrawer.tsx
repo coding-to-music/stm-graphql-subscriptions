@@ -52,8 +52,8 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
                 {data.me.username}
               </Flex>
             ) : (
-              "Menu"
-            )}
+                "Menu"
+              )}
           </DrawerHeader>
 
           <DrawerBody>{children}</DrawerBody>
@@ -66,6 +66,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
                 onClick={async () => {
                   await logout();
                   await apolloClient.resetStore();
+                  document.cookie = "qid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
                   await onClose();
                 }}
                 isLoading={logoutFetching}
@@ -73,12 +74,12 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
                 Logout
               </Button>
             ) : (
-              <NextLink href="/login">
-                <Button mr={3} variant="outline" variantColor={defaultColor}>
-                  Login
+                <NextLink href="/login">
+                  <Button mr={3} variant="outline" variantColor={defaultColor}>
+                    Login
                 </Button>
-              </NextLink>
-            )}
+                </NextLink>
+              )}
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>

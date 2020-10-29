@@ -42,6 +42,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ defaultColor, label }) => {
               onClick={async () => {
                 await logout();
                 await apolloClient.resetStore();
+                document.cookie = "qid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
                 await onClose();
               }}
               isLoading={logoutFetching}

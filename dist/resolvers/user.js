@@ -202,7 +202,7 @@ let UserResolver = class UserResolver {
             return { user };
         });
     }
-    login(usernameOrEmail, password, { req, res }) {
+    login(usernameOrEmail, password, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne(usernameOrEmail.includes("@")
                 ? { where: { email: usernameOrEmail } }
@@ -232,9 +232,8 @@ let UserResolver = class UserResolver {
             const signedCookie = cookieJar.sign(req.sessionID, constants_1.SECRET);
             const cookie = {
                 name: constants_1.COOKIE_NAME,
-                value: `s%3A${signedCookie}`,
+                value: encodeURIComponent(`s:${signedCookie}`),
             };
-            console.log(`${constants_1.COOKIE_NAME}=s%3A${signedCookie}`);
             return {
                 user,
                 cookie,

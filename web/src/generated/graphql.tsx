@@ -155,12 +155,19 @@ export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
+  cookie?: Maybe<Cookie>;
 };
 
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
   message: Scalars['String'];
+};
+
+export type Cookie = {
+  __typename?: 'Cookie';
+  name: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type UsernamePasswordInput = {
@@ -183,6 +190,11 @@ export type PostSnippetFragment = (
   ) }
 );
 
+export type RegularCookieFragment = (
+  { __typename?: 'Cookie' }
+  & Pick<Cookie, 'name' | 'value'>
+);
+
 export type RegularErrorFragment = (
   { __typename?: 'FieldError' }
   & Pick<FieldError, 'field' | 'message'>
@@ -201,6 +213,9 @@ export type RegularUserResponseFragment = (
   )>>, user?: Maybe<(
     { __typename?: 'User' }
     & RegularUserFragment
+  )>, cookie?: Maybe<(
+    { __typename?: 'Cookie' }
+    & RegularCookieFragment
   )> }
 );
 
@@ -423,6 +438,12 @@ export const RegularUserFragmentDoc = gql`
   username
 }
     `;
+export const RegularCookieFragmentDoc = gql`
+    fragment RegularCookie on Cookie {
+  name
+  value
+}
+    `;
 export const RegularUserResponseFragmentDoc = gql`
     fragment RegularUserResponse on UserResponse {
   errors {
@@ -431,9 +452,13 @@ export const RegularUserResponseFragmentDoc = gql`
   user {
     ...RegularUser
   }
+  cookie {
+    ...RegularCookie
+  }
 }
     ${RegularErrorFragmentDoc}
-${RegularUserFragmentDoc}`;
+${RegularUserFragmentDoc}
+${RegularCookieFragmentDoc}`;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {
   changePassword(token: $token, newPassword: $newPassword) {

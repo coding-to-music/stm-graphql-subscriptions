@@ -194,7 +194,7 @@ export class UserResolver {
   async login(
     @Arg("usernameOrEmail") usernameOrEmail: string,
     @Arg("password") password: string,
-    @Ctx() { req, res }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const user = await User.findOne(
       usernameOrEmail.includes("@")
@@ -227,9 +227,8 @@ export class UserResolver {
     const signedCookie = cookieJar.sign(req.sessionID!, SECRET);
     const cookie = {
       name: COOKIE_NAME,
-      value: `s%3A${signedCookie}`,
+      value: encodeURIComponent(`s:${signedCookie}`),
     };
-    console.log(`${COOKIE_NAME}=s%3A${signedCookie}`);
 
     return {
       user,

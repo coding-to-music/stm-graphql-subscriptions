@@ -1,0 +1,4 @@
+fragment RegularCookie on Cookie {
+  name
+  value
+}

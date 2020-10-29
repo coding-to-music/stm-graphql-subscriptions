@@ -5,4 +5,7 @@ fragment RegularUserResponse on UserResponse {
   user {
     ...RegularUser
   }
+  cookie {
+    ...RegularCookie
+  }
 }

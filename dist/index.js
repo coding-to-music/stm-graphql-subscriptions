@@ -51,9 +51,16 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const redis = new ioredis_1.default(constants_1.REDIS_URL);
     yield redis.flushall();
     app.use(cors_1.default({
-        origin: constants_1.CLIENT_ORIGIN,
+        origin: true,
         credentials: true,
     }));
+    app.use((req, _, next) => {
+        const token = req.headers.authorization;
+        if (token) {
+            req.headers.cookie = `${constants_1.COOKIE_NAME}=${token}`;
+        }
+        next();
+    });
     app.use(express_session_1.default({
         name: constants_1.COOKIE_NAME,
         store: new RedisStore({

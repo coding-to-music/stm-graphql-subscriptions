@@ -4,6 +4,7 @@ import { PaginatedPosts } from "../generated/graphql";
 import { NextPageContext } from "next";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { WebSocketLink } from "@apollo/client/link/ws";
+import { setContext } from "@apollo/client/link/context";
 
 const wsLink: any = process.browser
   ? new WebSocketLink({
@@ -34,10 +35,26 @@ const link = process.browser
     )
   : httplink;
 
+const authLink = setContext((_: any, { headers }: any) => {
+  const cookie =
+    typeof document !== "undefined" && document.cookie
+      ? document.cookie
+          .split("; ")
+          .find((row: any) => row.startsWith("qid"))!
+          .split("=")[1]
+      : undefined;
+  return {
+    headers: {
+      ...headers,
+      authorization: cookie ? cookie : "",
+    },
+  };
+});
+
 const createClient = (ctx: NextPageContext) =>
   new ApolloClient({
     // uri: "http://localhost:4000/graphql",
-    link,
+    link: authLink.concat(link),
     credentials: "include" as const,
     headers: {
       cookie:
