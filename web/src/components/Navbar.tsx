@@ -7,6 +7,7 @@ import { DarkModeSwitch } from "./DarkModeSwitch";
 import { HomeButton } from "./HomeButton";
 import LogoutModal from "./LogoutModal";
 import MenuDrawer from "./MenuDrawer";
+import { pages } from '../../constants'
 
 interface NavbarProps {
   defaultColor: string;
@@ -59,18 +60,11 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
         mr={2}
         display={["none", "flex", "flex", "flex"]}
       >
-        <NextLink href="/gini">
-          <Link mr={8}>Gini</Link>
-        </NextLink>
-        <NextLink href="/charts">
-          <Link mr={8}>Charts</Link>
-        </NextLink>
-        <NextLink href="/map">
-          <Link mr={8}>Map</Link>
-        </NextLink>
-        <NextLink href="/posts">
-          <Link mr={8}>Posts</Link>
-        </NextLink>
+        {pages.map((page, index) => (
+          <NextLink key={index} href={page.path}>
+            <Link mr={8}>{page.title}</Link>
+          </NextLink>
+        ))}
         {body}
         <DarkModeSwitch defaultColor={defaultColor} />
       </Flex>
@@ -87,26 +81,13 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
               <Link>Home</Link>
             </NextLink>
           </Box>
-          <Box mt={6}>
-            <NextLink href="/gini">
-              <Link>Gini</Link>
-            </NextLink>
-          </Box>
-          <Box mt={6}>
-            <NextLink href="/charts">
-              <Link>Charts</Link>
-            </NextLink>
-          </Box>
-          <Box mt={6}>
-            <NextLink href="/map">
-              <Link>Map</Link>
-            </NextLink>
-          </Box>
-          <Box mt={6}>
-            <NextLink href="/posts">
-              <Link>Posts</Link>
-            </NextLink>
-          </Box>
+          {pages.map((page, index) => (
+            <Box key={index} mt={6}>
+              <NextLink href={page.path}>
+                <Link>{page.title}</Link>
+              </NextLink>
+            </Box>
+          ))}
           {!data?.me ? (
             <Box mt={6}>
               <NextLink href="/register">

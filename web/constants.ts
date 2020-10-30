@@ -9,3 +9,10 @@ export const COOKIE_NAME = "qid";
 export const HOMEPAGE_URL = "https://anselbrandt.com";
 
 export const HOMEPAGE_CODE = "https://github.com/anselbrandt/hacker-news-clone";
+
+export const pages = [
+  { path: "/gini", title: "Gini" },
+  { path: "/charts", title: "Charts" },
+  { path: "/map", title: "Map" },
+  { path: "/posts", title: "Posts" },
+];
