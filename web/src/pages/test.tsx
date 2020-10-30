@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Flex, Box } from "@chakra-ui/core";
+import { Flex, Box, Spinner, useColorMode } from "@chakra-ui/core";
 import { Layout } from "../components/Layout";
 import { withApollo } from "../utils/withApollo";
 
@@ -8,6 +8,8 @@ interface testProps {
 }
 
 const test: React.FC<testProps> = ({ defaultColor }) => {
+  const { colorMode } = useColorMode();
+  const bgColor = { light: "white", dark: "gray.800" };
   useEffect(() => {
     if (document) {
       const d = new Date();
@@ -19,7 +21,18 @@ const test: React.FC<testProps> = ({ defaultColor }) => {
   return (
     <Layout defaultColor={defaultColor}>
       <Flex alignItems="center" flexDir="column">
-        Test
+        <Box>
+          <Spinner
+            thickness="4px"
+            speed="1s"
+            emptyColor={bgColor[colorMode]}
+            color="red.500"
+            size="xl"
+          />
+        </Box>
+        <Box>
+
+        </Box>
       </Flex>
     </Layout>
   );

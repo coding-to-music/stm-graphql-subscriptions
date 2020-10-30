@@ -12,8 +12,7 @@ import {
   useDisclosure,
   Flex,
 } from "@chakra-ui/core";
-import { useLogoutMutation } from "../generated/graphql";
-import { useApolloClient } from "@apollo/client";
+import LogoutButton from './LogoutButton'
 import NextLink from "next/link";
 import { useMeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
@@ -23,8 +22,7 @@ interface MenuDrawerProps {
 }
 
 const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
-  const [logout, { loading: logoutFetching }] = useLogoutMutation();
-  const apolloClient = useApolloClient();
+
   const { data } = useMeQuery({
     skip: isServer(),
   });
@@ -60,19 +58,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
 
           <DrawerFooter mb={20}>
             {data?.me ? (
-              <Button
-                mr={3}
-                variantColor={defaultColor}
-                onClick={async () => {
-                  await logout();
-                  await apolloClient.resetStore();
-                  document.cookie = "qid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                  await onClose();
-                }}
-                isLoading={logoutFetching}
-              >
-                Logout
-              </Button>
+              <LogoutButton onClose={onClose} defaultColor={defaultColor} />
             ) : (
                 <NextLink href="/login">
                   <Button mr={3} variant="outline" variantColor={defaultColor}>

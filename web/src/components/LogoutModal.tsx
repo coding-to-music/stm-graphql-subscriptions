@@ -10,8 +10,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@chakra-ui/core";
-import { useLogoutMutation } from "../generated/graphql";
-import { useApolloClient } from "@apollo/client";
+import LogoutButton from './LogoutButton'
 
 interface LogoutModalProps {
   defaultColor: string;
@@ -20,8 +19,6 @@ interface LogoutModalProps {
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ defaultColor, label }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [logout, { loading: logoutFetching }] = useLogoutMutation();
-  const apolloClient = useApolloClient();
 
   return (
     <>
@@ -37,18 +34,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ defaultColor, label }) => {
           <ModalBody>Do you want to logout?</ModalBody>
 
           <ModalFooter>
-            <Button
-              variantColor={defaultColor}
-              onClick={async () => {
-                await logout();
-                await apolloClient.resetStore();
-                document.cookie = "qid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                await onClose();
-              }}
-              isLoading={logoutFetching}
-            >
-              Logout
-            </Button>
+            <LogoutButton onClose={onClose} defaultColor={defaultColor} />
             <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
