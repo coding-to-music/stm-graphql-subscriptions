@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Heading, Box } from "@chakra-ui/core";
+import { Button, Heading, Box, Link } from "@chakra-ui/core";
 import NextLink from "next/link";
 
 interface HomeButtonProps {

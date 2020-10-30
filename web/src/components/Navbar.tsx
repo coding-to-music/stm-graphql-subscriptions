@@ -24,10 +24,10 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
     body = (
       <>
         <NextLink href="/login">
-          <Link mr={8}>Login</Link>
+          <Link href="/login" mr={8}>Login</Link>
         </NextLink>
         <NextLink href="/register">
-          <Link mr={8}>Register</Link>
+          <Link href="/register" mr={8}>Register</Link>
         </NextLink>
       </>
     );
@@ -78,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
         <MenuDrawer defaultColor={defaultColor}>
           <Box mt={6}>
             <NextLink href="/">
-              <Link>Home</Link>
+              <Link href="/">Home</Link>
             </NextLink>
           </Box>
           {pages.map((page, index) => (
@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
           {!data?.me ? (
             <Box mt={6}>
               <NextLink href="/register">
-                <Link>Register</Link>
+                <Link href="/register">Register</Link>
               </NextLink>
             </Box>
           ) : null}
