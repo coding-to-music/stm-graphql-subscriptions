@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
       >
         {pages.map((page, index) => (
           <NextLink key={index} href={page.path}>
-            <Link mr={8}>{page.title}</Link>
+            <Link href={page.path} mr={8}>{page.title}</Link>
           </NextLink>
         ))}
         {body}
@@ -84,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
           {pages.map((page, index) => (
             <Box key={index} mt={6}>
               <NextLink href={page.path}>
-                <Link>{page.title}</Link>
+                <Link href={page.path}>{page.title}</Link>
               </NextLink>
             </Box>
           ))}

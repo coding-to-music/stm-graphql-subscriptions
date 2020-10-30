@@ -15,4 +15,5 @@ export const pages = [
   { path: "/charts", title: "Charts" },
   { path: "/map", title: "Map" },
   { path: "/posts", title: "Posts" },
+  { path: "/test", title: "Test" },
 ];
