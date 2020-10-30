@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/core";
 import NextLink from "next/link";
+import { HOMEPAGE_URL, HOMEPAGE_CODE } from '../../constants'
 
 import { Container } from "./Container";
 
@@ -17,7 +18,7 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
       maxWidth="48rem"
       py={2}
     >
-      <NextLink href="https://anselbrandt.com">
+      <NextLink href={HOMEPAGE_URL}>
         <Button
           width="100%"
           variant="outline"
@@ -29,7 +30,7 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
         </Button>
       </NextLink>
 
-      <NextLink href="https://github.com/anselbrandt/hacker-news-clone">
+      <NextLink href={HOMEPAGE_CODE}>
         <Button
           width="100%"
           variant="solid"

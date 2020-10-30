@@ -5,11 +5,12 @@ import { NextPageContext } from "next";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { setContext } from "@apollo/client/link/context";
+import { WEBSOCKET, HTTP } from "../../constants";
 
 const wsLink: any = process.browser
   ? new WebSocketLink({
       // if you instantiate in the server, the error will be thrown
-      uri: process.env.NEXT_PUBLIC_WEBSOCKET || `ws://localhost:4000/graphql`,
+      uri: WEBSOCKET,
       options: {
         reconnect: true,
       },
@@ -17,7 +18,7 @@ const wsLink: any = process.browser
   : null;
 
 const httplink = new HttpLink({
-  uri: process.env.NEXT_PUBLIC_HTTP || "http://localhost:4000/graphql",
+  uri: HTTP,
   credentials: "include",
 });
 

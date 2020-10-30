@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@chakra-ui/core'
 import { useLogoutMutation } from "../generated/graphql";
 import { useApolloClient } from "@apollo/client";
+import { COOKIE_NAME } from '../../constants'
 
 interface LogoutButtonProps {
     defaultColor: string;
@@ -19,7 +20,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ defaultColor, onClose }) =>
                 onClick={async () => {
                     await logout();
                     await apolloClient.resetStore();
-                    document.cookie = "qid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                    document.cookie = `${COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
                     await onClose;
                 }}
                 isLoading={logoutFetching}
