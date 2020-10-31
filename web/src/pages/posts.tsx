@@ -45,33 +45,33 @@ const Posts: React.FC<PostsProps> = ({ defaultColor }) => {
       {!data && loading ? (
         <div>loading...</div>
       ) : (
-          <Stack>
-            {data!.posts.posts.map((p) =>
-              !p ? null : (
-                <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
-                  <UpdootSection post={p} />
-                  <Box flex={1}>
-                    <NextLink href="/post/[id]" as={`/post/${p.id}`}>
-                      <Link>
-                        <Heading fontSize="xl">{p.title}</Heading>
-                      </Link>
-                    </NextLink>
-                    <Text>{p.creator.username}</Text>
-                    <Flex>
-                      <Text mt={4}>{p.textSnippet}</Text>
-                      <Box ml="auto">
-                        <EditDeletePostButtons
-                          id={p.id}
-                          creatorId={p.creator.id}
-                        />
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Flex>
-              )
-            )}
-          </Stack>
-        )}
+        <Stack>
+          {data!.posts.posts.map((p) =>
+            !p ? null : (
+              <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+                <UpdootSection post={p} />
+                <Box flex={1}>
+                  <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{p.title}</Heading>
+                    </Link>
+                  </NextLink>
+                  <Text>{p.creator.username}</Text>
+                  <Flex>
+                    <Text mt={4}>{p.textSnippet}</Text>
+                    <Box ml="auto">
+                      <EditDeletePostButtons
+                        id={p.id}
+                        creatorId={p.creator.id}
+                      />
+                    </Box>
+                  </Flex>
+                </Box>
+              </Flex>
+            )
+          )}
+        </Stack>
+      )}
       {data && data?.posts.hasMore ? (
         <Flex>
           <Button

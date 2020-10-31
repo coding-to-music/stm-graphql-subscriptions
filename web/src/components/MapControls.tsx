@@ -175,7 +175,7 @@ const MapControls: React.FC<MapControlsProps> = ({
               borderRadius="0.5rem"
             >
               {filteredResults
-                ? filteredResults.map((value:any) => (
+                ? filteredResults.map((value: any) => (
                     <Box key={value.properties.shape_id}>
                       <Text>
                         {value.properties.headsign}{" "}

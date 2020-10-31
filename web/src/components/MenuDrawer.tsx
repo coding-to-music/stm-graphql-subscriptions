@@ -12,7 +12,7 @@ import {
   useDisclosure,
   Flex,
 } from "@chakra-ui/core";
-import LogoutButton from './LogoutButton'
+import LogoutButton from "./LogoutButton";
 import NextLink from "next/link";
 import { useMeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
@@ -22,7 +22,6 @@ interface MenuDrawerProps {
 }
 
 const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
-
   const { data } = useMeQuery({
     skip: isServer(),
   });
@@ -50,8 +49,8 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
                 {data.me.username}
               </Flex>
             ) : (
-                "Menu"
-              )}
+              "Menu"
+            )}
           </DrawerHeader>
 
           <DrawerBody>{children}</DrawerBody>
@@ -60,12 +59,12 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ defaultColor, children }) => {
             {data?.me ? (
               <LogoutButton onClose={onClose} defaultColor={defaultColor} />
             ) : (
-                <NextLink href="/login">
-                  <Button mr={3} variant="outline" variantColor={defaultColor}>
-                    Login
+              <NextLink href="/login">
+                <Button mr={3} variant="outline" variantColor={defaultColor}>
+                  Login
                 </Button>
-                </NextLink>
-              )}
+              </NextLink>
+            )}
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>

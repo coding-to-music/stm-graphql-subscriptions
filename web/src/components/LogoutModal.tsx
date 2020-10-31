@@ -10,7 +10,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@chakra-ui/core";
-import LogoutButton from './LogoutButton'
+import LogoutButton from "./LogoutButton";
 
 interface LogoutModalProps {
   defaultColor: string;

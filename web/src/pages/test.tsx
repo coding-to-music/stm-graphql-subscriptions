@@ -13,11 +13,11 @@ const test: React.FC<testProps> = ({ defaultColor }) => {
   useEffect(() => {
     if (document) {
       const d = new Date();
-      d.setTime(d.getTime() + 1000 * 60 * 60 * 24 * 365 * 10)
+      d.setTime(d.getTime() + 1000 * 60 * 60 * 24 * 365 * 10);
       const expires = d.toUTCString();
-      document.cookie = `name=asdfghkl; expires=${expires};`
+      document.cookie = `name=asdfghkl; expires=${expires};`;
     }
-  })
+  });
   return (
     <Layout defaultColor={defaultColor}>
       <Flex alignItems="center" flexDir="column">
@@ -30,9 +30,7 @@ const test: React.FC<testProps> = ({ defaultColor }) => {
             size="xl"
           />
         </Box>
-        <Box>
-
-        </Box>
+        <Box></Box>
       </Flex>
     </Layout>
   );

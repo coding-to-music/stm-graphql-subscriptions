@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/core";
 import NextLink from "next/link";
-import { HOMEPAGE_URL, HOMEPAGE_CODE } from '../../constants'
+import { HOMEPAGE_URL, HOMEPAGE_CODE } from "../../constants";
 
 import { Container } from "./Container";
 
@@ -11,7 +11,7 @@ interface CTAProps {
 export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
   return (
     <Container
-      flexDirection='row'
+      flexDirection="row"
       position="fixed"
       bottom="0"
       width="100%"
@@ -20,7 +20,7 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
     >
       <NextLink href={HOMEPAGE_URL} passHref>
         <Button
-        as='a'
+          as="a"
           width="100%"
           variant="outline"
           variantColor={defaultColor}
@@ -33,7 +33,7 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
 
       <NextLink href={HOMEPAGE_CODE} passHref>
         <Button
-        as='a'
+          as="a"
           width="100%"
           variant="solid"
           variantColor={defaultColor}

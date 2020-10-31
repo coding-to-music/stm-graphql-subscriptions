@@ -18,7 +18,7 @@ import { Navbar } from "../components/Navbar";
 import { usePostsQuery } from "../generated/graphql";
 import NextLink from "next/link";
 import { withApollo } from "../utils/withApollo";
-import { HOMEPAGE_URL } from '../../constants'
+import { HOMEPAGE_URL } from "../../constants";
 
 interface IndexProps {
   defaultColor: string;
@@ -45,34 +45,19 @@ const Index: React.FC<IndexProps> = ({ defaultColor }) => {
           <List spacing={3} my={0}>
             <ListItem>
               <ListIcon icon="check-circle" color={`${defaultColor}.500`} />
-              <ChakraLink
-                isExternal
-                href={HOMEPAGE_URL}
-                flexGrow={1}
-                mr={2}
-              >
+              <ChakraLink isExternal href={HOMEPAGE_URL} flexGrow={1} mr={2}>
                 About <Icon name="external-link" mx="2px" />
               </ChakraLink>
             </ListItem>
             <ListItem>
               <ListIcon icon="check-circle" color={`${defaultColor}.500`} />
-              <ChakraLink
-                isExternal
-                href={HOMEPAGE_URL}
-                flexGrow={1}
-                mr={2}
-              >
+              <ChakraLink isExternal href={HOMEPAGE_URL} flexGrow={1} mr={2}>
                 Projects <Icon name="external-link" mx="2px" />
               </ChakraLink>
             </ListItem>
             <ListItem>
               <ListIcon icon="check-circle" color={`${defaultColor}.500`} />
-              <ChakraLink
-                isExternal
-                href={HOMEPAGE_URL}
-                flexGrow={1}
-                mr={2}
-              >
+              <ChakraLink isExternal href={HOMEPAGE_URL} flexGrow={1} mr={2}>
                 Skills <Icon name="external-link" mx="2px" />
               </ChakraLink>
             </ListItem>
@@ -82,20 +67,20 @@ const Index: React.FC<IndexProps> = ({ defaultColor }) => {
         {!data && loading ? (
           <div>loading...</div>
         ) : (
-            <>
-              <Box justifyContent="start">
-                {data?.posts.posts.slice(0, 9).map((p) =>
-                  !p ? null : (
-                    <Box key={p.id} mb={2}>
-                      <NextLink href="/post/[id]" as={`/post/${p.id}`}>
-                        <Link>{p.title}</Link>
-                      </NextLink>
-                    </Box>
-                  )
-                )}
-              </Box>
-            </>
-          )}
+          <>
+            <Box justifyContent="start">
+              {data?.posts.posts.slice(0, 9).map((p) =>
+                !p ? null : (
+                  <Box key={p.id} mb={2}>
+                    <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                      <Link>{p.title}</Link>
+                    </NextLink>
+                  </Box>
+                )
+              )}
+            </Box>
+          </>
+        )}
         {data && !loading ? (
           <Box mt={4}>
             <NextLink href="/posts">

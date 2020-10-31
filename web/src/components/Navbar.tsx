@@ -7,7 +7,7 @@ import { DarkModeSwitch } from "./DarkModeSwitch";
 import { HomeButton } from "./HomeButton";
 import LogoutModal from "./LogoutModal";
 import MenuDrawer from "./MenuDrawer";
-import { pages } from '../../constants'
+import { pages } from "../../constants";
 
 interface NavbarProps {
   defaultColor: string;
@@ -24,10 +24,14 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
     body = (
       <>
         <NextLink href="/login">
-          <Link href="/login" mr={8}>Login</Link>
+          <Link href="/login" mr={8}>
+            Login
+          </Link>
         </NextLink>
         <NextLink href="/register">
-          <Link href="/register" mr={8}>Register</Link>
+          <Link href="/register" mr={8}>
+            Register
+          </Link>
         </NextLink>
       </>
     );
@@ -62,7 +66,9 @@ export const Navbar: React.FC<NavbarProps> = ({ defaultColor }) => {
       >
         {pages.map((page, index) => (
           <NextLink key={index} href={page.path}>
-            <Link href={page.path} mr={8}>{page.title}</Link>
+            <Link href={page.path} mr={8}>
+              {page.title}
+            </Link>
           </NextLink>
         ))}
         {body}

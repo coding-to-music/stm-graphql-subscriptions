@@ -27,7 +27,7 @@ import { useGetViewport } from "../utils/useGetViewport";
 interface Data {
   dates: [];
   series: [];
-  y: string
+  y: string;
 }
 
 interface HoverInfo {
@@ -47,10 +47,13 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
   // const txtBgColor = { light: "white", dark: "rgba(255,255,255,0.06)" };
   const bordColor = { light: "gray.200", dark: "rgba(255,255,255,0.04)" };
   const chartColor = { light: colors.purple[200], dark: colors.purple[600] };
-  const highlightColor = { light: colors.purple[600], dark: colors.purple[300] }
-  const muteColor = { light: colors.purple[100], dark: colors.purple[900] }
+  const highlightColor = {
+    light: colors.purple[600],
+    dark: colors.purple[300],
+  };
+  const muteColor = { light: colors.purple[100], dark: colors.purple[900] };
 
-  const linkColor = { light: 'purple.500', dark: 'purple.200' }
+  const linkColor = { light: "purple.500", dark: "purple.200" };
 
   const { width: viewportWidth, height: viewportHeight } = useGetViewport();
   const width = viewportWidth * 0.8;
@@ -58,7 +61,7 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
   const [rawData, setRawData] = useState<string | undefined>();
   const [data, setData] = useState<Data | undefined>();
   const svgRef = useRef<SVGSVGElement>(null);
-  const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>()
+  const [hoverInfo, setHoverInfo] = useState<HoverInfo | undefined>();
 
   useEffect(() => {
     fetch("./unemployment.tsv")
@@ -141,16 +144,16 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           .selectAll(".line")
           .style("mix-blend-mode", null)
           .attr("stroke", muteColor[colorMode]);
-        dot.attr("display", 'visible');
+        dot.attr("display", "visible");
       };
 
       const left = () => {
         svg
           .selectAll(".line")
-          .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
+          .style("mix-blend-mode", colorMode === "dark" ? "screen" : "multiply")
           .attr("stroke", chartColor[colorMode]);
         dot.attr("display", "none");
-        setHoverInfo(undefined)
+        setHoverInfo(undefined);
       };
 
       // xm: date, ym: unemployment, i: index, s: data object
@@ -164,20 +167,21 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
 
         svg
           .selectAll(".line")
-          .attr("stroke", (d: any) => (d === s ? highlightColor[colorMode] : muteColor[colorMode]))
+          .attr("stroke", (d: any) =>
+            d === s ? highlightColor[colorMode] : muteColor[colorMode]
+          )
           .filter((d: any) => d === s)
           .raise();
-        dot.attr(
-          "transform",
-          `translate(${x(data.dates[i])},${y(s.values[i])})`
-        ).attr("fill", highlightColor[colorMode]);
-        dot.select("text").style('fill', color[colorMode])
+        dot
+          .attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`)
+          .attr("fill", highlightColor[colorMode]);
+        dot.select("text").style("fill", color[colorMode]);
         // .text(s.name);
         setHoverInfo({
           text: s.name,
           x: x(data.dates[i]) + margin.left + margin.right,
-          y: y(s.values[i]) + margin.top + margin.bottom
-        })
+          y: y(s.values[i]) + margin.top + margin.bottom,
+        });
       };
 
       const rect = (g: any) =>
@@ -209,17 +213,21 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
         .attr("stroke-width", 1.5)
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
-        .style("mix-blend-mode", colorMode === 'dark' ? "screen" : "multiply")
+        .style("mix-blend-mode", colorMode === "dark" ? "screen" : "multiply")
         .attr("d", (d: any) => getLine(d.values));
-
     }
   }, [width, height, data, svgRef, colorMode]);
 
   return (
     <Layout defaultColor={defaultColor}>
-      <Box mb={2} >
-        <Link color={linkColor[colorMode]} href="https://observablehq.com/@d3/multi-line-chart" isExternal>
-          Observable Example<Icon name="external-link" mx="2px" />
+      <Box mb={2}>
+        <Link
+          color={linkColor[colorMode]}
+          href="https://observablehq.com/@d3/multi-line-chart"
+          isExternal
+        >
+          Observable Example
+          <Icon name="external-link" mx="2px" />
         </Link>
       </Box>
       <Box
@@ -232,12 +240,13 @@ const Charts: React.FC<ChartsProps> = ({ defaultColor }) => {
           <g className="yAxis" />
         </svg>
         {hoverInfo ? (
-          <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>{hoverInfo!.text}</Box>
+          <Box pos="absolute" left={hoverInfo!.x} top={hoverInfo!.y}>
+            {hoverInfo!.text}
+          </Box>
         ) : null}
       </Box>
-
-    </Layout >
-  )
-}
+    </Layout>
+  );
+};
 
 export default withApollo({ ssr: true })(Charts);

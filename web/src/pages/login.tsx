@@ -38,9 +38,11 @@ const Login: React.FC<LoginProps> = ({ defaultColor }) => {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             const d = new Date();
-            d.setTime(d.getTime() + 1000 * 60 * 60 * 24 * 365 * 10)
+            d.setTime(d.getTime() + 1000 * 60 * 60 * 24 * 365 * 10);
             const expires = d.toUTCString();
-            document.cookie = `${response.data.login.cookie!.name}=${response.data.login.cookie!.value}; expires=${expires};`
+            document.cookie = `${response.data.login.cookie!.name}=${
+              response.data.login.cookie!.value
+            }; expires=${expires};`;
             if (typeof router.query.next === "string") {
               router.push(router.query.next);
             } else {

@@ -8,12 +8,12 @@ interface HomeButtonProps {
 
 export const HomeButton: React.FC<HomeButtonProps> = ({ defaultColor }) => {
   return (
-      <Box>
-        <NextLink href="/" passHref>
-          <Button as='a' variant="outline" variantColor={defaultColor}>
-            <Heading size="xl">ab</Heading>
-          </Button>
-        </NextLink>
-      </Box>
+    <Box>
+      <NextLink href="/" passHref>
+        <Button as="a" variant="outline" variantColor={defaultColor}>
+          <Heading size="xl">ab</Heading>
+        </Button>
+      </NextLink>
+    </Box>
   );
 };

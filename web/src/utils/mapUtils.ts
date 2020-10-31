@@ -30,8 +30,8 @@ export const positionGenerator = (arr: any) =>
     };
   });
 
-export const getMetroColors = (str: string, filter: any):RGBAColor => {
-  let colorValue:RGBAColor = [0,0,0];
+export const getMetroColors = (str: string, filter: any): RGBAColor => {
+  let colorValue: RGBAColor = [0, 0, 0];
   switch (str) {
     case "verte":
       colorValue = [0, 128, 0];
@@ -51,7 +51,7 @@ export const getMetroColors = (str: string, filter: any):RGBAColor => {
   return colorValue;
 };
 
-export const hexToRgb = (hex: string):RGBAColor => {
+export const hexToRgb = (hex: string): RGBAColor => {
   hex = hex.replace(/^#/, "");
   hex = hex.slice(0, 6);
   const number = Number.parseInt(hex, 16);
