@@ -18,8 +18,9 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
       maxWidth="48rem"
       py={2}
     >
-      <NextLink href={HOMEPAGE_URL}>
+      <NextLink href={HOMEPAGE_URL} passHref>
         <Button
+        as='a'
           width="100%"
           variant="outline"
           variantColor={defaultColor}
@@ -30,8 +31,9 @@ export const CTA: React.FC<CTAProps> = ({ defaultColor }) => {
         </Button>
       </NextLink>
 
-      <NextLink href={HOMEPAGE_CODE}>
+      <NextLink href={HOMEPAGE_CODE} passHref>
         <Button
+        as='a'
           width="100%"
           variant="solid"
           variantColor={defaultColor}
