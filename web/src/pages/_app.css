@@ -27,3 +27,7 @@
 .scrollbarDark::-webkit-scrollbar-corner {
   background: #171923;
 }
+
+.linkButton:hover {
+  text-decoration: none;
+}
