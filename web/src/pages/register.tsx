@@ -35,7 +35,17 @@ const Register: React.FC<registerProps> = ({ defaultColor }) => {
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else if (response.data?.register.user) {
-            router.back();
+            const d = new Date();
+            d.setTime(d.getTime() + 1000 * 60 * 60 * 24 * 365 * 10);
+            const expires = d.toUTCString();
+            document.cookie = `${response.data.register.cookie!.name}=${
+              response.data.register.cookie!.value
+            }; expires=${expires};`;
+            if (typeof router.query.next === "string") {
+              router.push(router.query.next);
+            } else {
+              router.back();
+            }
           }
         }}
       >
