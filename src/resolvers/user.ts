@@ -52,10 +52,8 @@ class FieldError {
 class UserResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
-
   @Field(() => User, { nullable: true })
   user?: User;
-
   @Field(() => Cookie, { nullable: true })
   cookie?: Cookie;
 }
