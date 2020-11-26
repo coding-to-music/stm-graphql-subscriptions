@@ -185,7 +185,13 @@ export class UserResolver {
       }
     }
     req.session.userId = user.id;
-    return { user };
+    req.session.userId = user.id;
+    const signedCookie = cookieJar.sign(req.sessionID!, SECRET);
+    const cookie = {
+      name: COOKIE_NAME,
+      value: encodeURIComponent(`s:${signedCookie}`),
+    };
+    return { user, cookie };
   }
 
   @Mutation(() => UserResponse)
