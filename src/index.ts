@@ -131,12 +131,13 @@ const main = async () => {
           "disconnected: ",
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
-        let subscribers = await +redis.get("subscribers");
-        if (subscribers > 0) {
+        const subscribers = await redis.get("subscribers");
+        let numSubs = 0;
+        if (subscribers && +subscribers > 0) {
           await redis.decr("subscribers");
-          subscribers--;
+          numSubs = parseInt(subscribers) - 1;
         }
-        console.log("subscribers: ", subscribers);
+        console.log("subscribers: ", numSubs);
       },
     },
   });

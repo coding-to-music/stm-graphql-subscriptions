@@ -119,12 +119,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             onDisconnect(webSocket) {
                 return __awaiter(this, void 0, void 0, function* () {
                     console.log("disconnected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
-                    let subscribers = yield +redis.get("subscribers");
-                    if (subscribers > 0) {
+                    const subscribers = yield redis.get("subscribers");
+                    let numSubs = 0;
+                    if (subscribers && +subscribers > 0) {
                         yield redis.decr("subscribers");
-                        subscribers--;
+                        numSubs = parseInt(subscribers) - 1;
                     }
-                    console.log("subscribers: ", subscribers);
+                    console.log("subscribers: ", numSubs);
                 });
             },
         },
