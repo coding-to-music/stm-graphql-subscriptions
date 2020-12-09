@@ -123,7 +123,7 @@ const main = async () => {
           webSocket.upgradeReq.headers["sec-websocket-key"]
         );
         await redis.incr("subscribers");
-        const subscribers = await +redis.get("subscribers");
+        const subscribers = await redis.get("subscribers");
         console.log("subscribers: ", subscribers);
       },
       async onDisconnect(webSocket: any) {
@@ -148,8 +148,8 @@ const main = async () => {
   });
 
   setInterval(async () => {
-    const subscribers = await +redis.get("subscribers");
-    if (subscribers > 0) {
+    const subscribers = await redis.get("subscribers");
+    if (subscribers && +subscribers > 0) {
       const feed = await useGetPositions();
       await redis.set("positions", JSON.stringify(feed));
       await redis.expire("positions", 11);

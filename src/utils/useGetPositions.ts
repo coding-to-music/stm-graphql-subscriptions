@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-import { APIKEY, REDIS_URL } from "../constants";
+import { STMKEY, REDIS_URL } from "../constants";
 // import { promises as fs } from "fs";
 import { feedParser } from "./feedParser";
 import Redis from "ioredis";
@@ -51,7 +51,7 @@ const liveData = async () => {
       method: "POST",
       mode: "no-cors",
       headers: {
-        apikey: APIKEY,
+        apikey: STMKEY,
         Accept: "*/*",
         "Cache-Control": "no-cache",
         Host: "api.stm.info",

@@ -199,7 +199,13 @@ let UserResolver = class UserResolver {
                 }
             }
             req.session.userId = user.id;
-            return { user };
+            req.session.userId = user.id;
+            const signedCookie = cookieJar.sign(req.sessionID, constants_1.SECRET);
+            const cookie = {
+                name: constants_1.COOKIE_NAME,
+                value: encodeURIComponent(`s:${signedCookie}`),
+            };
+            return { user, cookie };
         });
     }
     login(usernameOrEmail, password, { req }) {

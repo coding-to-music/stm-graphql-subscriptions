@@ -25,7 +25,7 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
         method: "POST",
         mode: "no-cors",
         headers: {
-            apikey: constants_1.APIKEY,
+            apikey: constants_1.STMKEY,
             Accept: "*/*",
             "Cache-Control": "no-cache",
             Host: "api.stm.info",
@@ -51,5 +51,6 @@ const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`${currentTime} live data: ${feed.count} vehicles, ${timestamp}`);
     return feed;
 });
-exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
+const useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
+exports.useGetPositions = useGetPositions;
 //# sourceMappingURL=useGetPositions.js.map

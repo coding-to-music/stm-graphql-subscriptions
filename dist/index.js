@@ -112,7 +112,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 return __awaiter(this, void 0, void 0, function* () {
                     console.log("connected: ", webSocket.upgradeReq.headers["sec-websocket-key"]);
                     yield redis.incr("subscribers");
-                    const subscribers = yield +redis.get("subscribers");
+                    const subscribers = yield redis.get("subscribers");
                     console.log("subscribers: ", subscribers);
                 });
             },
@@ -136,8 +136,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`"server started on localhost:${PORT}`);
     });
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-        const subscribers = yield +redis.get("subscribers");
-        if (subscribers > 0) {
+        const subscribers = yield redis.get("subscribers");
+        if (subscribers && +subscribers > 0) {
             const feed = yield useGetPositions_1.useGetPositions();
             yield redis.set("positions", JSON.stringify(feed));
             yield redis.expire("positions", 11);
