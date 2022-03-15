@@ -1,55 +1,79 @@
 import {
   Ctx,
+  Field,
+  ObjectType,
+  Query,
   Resolver,
   Subscription,
-  Query,
-  ObjectType,
-  Field,
 } from "type-graphql";
 import { useGetPositions } from "../utils/useGetPositions";
 
 @ObjectType()
+class Header {
+  @Field({ nullable: true })
+  gtfsRealtimeVersion: string;
+  @Field({ nullable: true })
+  incrementality: string;
+  @Field({ nullable: true })
+  timestamp: string;
+}
+
+@ObjectType()
+class VehicleTrip {
+  @Field({ nullable: true })
+  tripId: string;
+  @Field({ nullable: true })
+  startTime: string;
+  @Field({ nullable: true })
+  startDate: string;
+  @Field({ nullable: true })
+  routeId: string;
+}
+
+@ObjectType()
 class Position {
   @Field({ nullable: true })
-  latitude?: number;
+  latitude: number;
   @Field({ nullable: true })
-  longitude?: number;
+  longitude: number;
+  @Field({ nullable: true })
+  bearing: number;
+  @Field({ nullable: true })
+  speed: number;
 }
 
 @ObjectType()
 class Vehicle {
   @Field({ nullable: true })
-  id?: string;
+  trip: VehicleTrip;
   @Field({ nullable: true })
-  isDeleted?: boolean;
+  position: Position;
   @Field({ nullable: true })
-  tripId?: string;
+  currentStopSequence: number;
   @Field({ nullable: true })
-  startTime?: string;
+  currentStatus: string;
   @Field({ nullable: true })
-  startDate?: string;
+  timestamp: string;
   @Field({ nullable: true })
-  routeId?: string;
-  @Field(() => Position, { nullable: true })
-  position?: Position;
+  vehicle: { id: string };
   @Field({ nullable: true })
-  currentStopSequence?: number;
+  occupancyStatus: string;
+}
+
+@ObjectType()
+class Entity {
   @Field({ nullable: true })
-  currentStatus?: number;
+  id: string;
   @Field({ nullable: true })
-  timestamp?: number;
-  @Field({ nullable: true })
-  vehicleId?: string;
+  vehicle: Vehicle;
 }
 
 @ObjectType()
 class Feed {
-  @Field(() => [Vehicle], { nullable: true })
-  feed?: Vehicle[];
-  @Field({ nullable: true })
-  timestamp?: number;
-  @Field({ nullable: true })
-  count?: number;
+  @Field(() => Header, { nullable: true })
+  header: Header;
+  @Field(() => [Entity], { nullable: true })
+  entity: Entity[];
 }
 
 @Resolver()
