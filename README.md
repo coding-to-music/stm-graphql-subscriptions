@@ -6,8 +6,6 @@ https://github.com/coding-to-music/stm-graphql-subscriptions
 
 https://stm-graphql-subscriptions.vercel.app
 
-https://stm-graphql-subscriptions.herokuapp.com
-
 by ansel brandt https://github.com/anselbrandt
 
 https://ansel.vercel.app/map
@@ -73,29 +71,4 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin git@github.com:coding-to-music/stm-graphql-subscriptions.git
 git push -u origin main
-```
-
-## Heroku
-
-```java
-heroku create stm-graphql-subscriptions
-
-```
-
-## Heroku MongoDB Environment Variables
-
-```java
-heroku config:set
-
-heroku config:set MONGODB_URI="your value"
-```
-
-## Push to Heroku
-
-```java
-git push heroku
-
-# or
-
-npm run deploy
 ```
