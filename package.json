@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "engines": {
-    "node": "14"
+    "node": "14.x"
   },
   "cacheDirectories": [
     "node_modules",
@@ -11,10 +11,10 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cd frontend && npm install && npm run build",
+    "start": "node dist/index.js && cd frontend && npm run start",
     "watch": "tsc -w",
     "dev": "nodemon dist/index.js",
-    "start": "node dist/index.js",
     "deploy": "git add . && git commit -m Build && git push && vercel --prod"
   },
   "keywords": [],
