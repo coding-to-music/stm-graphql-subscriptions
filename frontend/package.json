@@ -22,7 +22,7 @@
     "formik": "^2.1.5",
     "graphql": "^15.3.0",
     "graphql-tag": "^2.11.0",
-    "next": "^9.1.7",
+    "next": "^12.1.6",
     "next-apollo": "^5.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "devDependencies": {
     "@danmarshall/deckgl-typings": "^4.3.5",
-    "@graphql-codegen/cli": "^1.17.8",
+    "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/typescript": "^1.17.9",
     "@graphql-codegen/typescript-operations": "^1.17.8",
     "@graphql-codegen/typescript-react-apollo": "^2.0.6",
