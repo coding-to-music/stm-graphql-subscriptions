@@ -12,45 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useGetPositions = void 0;
 const fetch = require("node-fetch");
-const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
-const constants_1 = require("../constants");
-const feedParser_1 = require("./feedParser");
 const ioredis_1 = __importDefault(require("ioredis"));
+const protobufjs_1 = __importDefault(require("protobufjs"));
+const constants_1 = require("../constants");
+const gtfs_json_1 = __importDefault(require("./gtfs.json"));
+const { Root } = protobufjs_1.default;
 const redis = new ioredis_1.default(constants_1.REDIS_URL);
 const liveData = () => __awaiter(void 0, void 0, void 0, function* () {
     const currentTime = new Date().toLocaleTimeString();
-    const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v1/vehiclePositions", {
-        method: "POST",
-        mode: "no-cors",
+    const schema = yield Root.fromJSON(gtfs_json_1.default);
+    const FeedMessage = schema.lookupType("transit_realtime.FeedMessage");
+    const response = yield fetch("https://api.stm.info/pub/od/gtfs-rt/ic/v2/vehiclePositions", {
+        method: "GET",
         headers: {
             apikey: constants_1.STMKEY,
-            Accept: "*/*",
-            "Cache-Control": "no-cache",
-            Host: "api.stm.info",
-            "Accept-Encoding": "gzip, deflate, br",
-            Connection: "keep-alive",
-            "Content-Length": "0",
         },
     });
-    const buffer = yield response.buffer();
-    const bufferHeader = buffer.toString().slice(0, 23);
-    if (bufferHeader === "API plan limit exceeded") {
-        console.log(`${bufferHeader}`);
+    if (response.ok) {
+        const arrayBuffer = yield response.arrayBuffer();
+        const array = new Uint8Array(arrayBuffer);
+        const decoded = FeedMessage.decode(array);
+        const feed = decoded;
+        yield redis.set("prevFeed", JSON.stringify(feed));
+        const timestamp = new Date(parseInt(feed.header.timestamp) * 1000).toLocaleTimeString();
+        console.log(`${currentTime} live data: ${feed.entity.length} vehicles, ${timestamp}`);
+        return feed;
+    }
+    else {
+        const text = response.statusText;
+        console.log(text);
         const json = yield redis.get("prevFeed");
         const prevFeed = JSON.parse(json);
-        const timestamp = new Date(prevFeed.timestamp * 1000).toLocaleTimeString();
-        console.log(`${currentTime} cached data: ${prevFeed.count} vehicles, ${timestamp}`);
+        const timestamp = new Date(parseInt(prevFeed.header.timestamp) * 1000).toLocaleTimeString();
+        console.log(`${currentTime} cached data: ${prevFeed.entity.length} vehicles, ${timestamp}`);
         return prevFeed;
     }
-    const raw = yield GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
-    const feed = feedParser_1.feedParser(raw);
-    yield redis.set("prevFeed", JSON.stringify(feed));
-    const timestamp = new Date(feed.timestamp * 1000).toLocaleTimeString();
-    console.log(`${currentTime} live data: ${feed.count} vehicles, ${timestamp}`);
-    return feed;
 });
-const useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
-exports.useGetPositions = useGetPositions;
+exports.useGetPositions = () => __awaiter(void 0, void 0, void 0, function* () { return yield liveData(); });
 //# sourceMappingURL=useGetPositions.js.map

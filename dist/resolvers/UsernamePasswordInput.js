@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsernamePasswordInput = void 0;
 const type_graphql_1 = require("type-graphql");
 let UsernamePasswordInput = class UsernamePasswordInput {
 };

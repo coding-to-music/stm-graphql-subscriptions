@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.feedParser = void 0;
-const feedParser = (response) => {
+exports.feedParser = (response) => {
     const timestamp = response.header.timestamp.low;
     const count = response.entity.length;
     const feed = response.entity.map((entity) => {
@@ -40,5 +39,4 @@ const feedParser = (response) => {
         feed: feed,
     };
 };
-exports.feedParser = feedParser;
 //# sourceMappingURL=feedParser.js.map

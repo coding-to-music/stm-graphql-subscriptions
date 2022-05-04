@@ -21,9 +21,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PositionsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const useGetPositions_1 = require("../utils/useGetPositions");
+let Header = class Header {
+};
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], Header.prototype, "gtfsRealtimeVersion", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], Header.prototype, "incrementality", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], Header.prototype, "timestamp", void 0);
+Header = __decorate([
+    type_graphql_1.ObjectType()
+], Header);
+let VehicleTrip = class VehicleTrip {
+};
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], VehicleTrip.prototype, "tripId", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], VehicleTrip.prototype, "startTime", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], VehicleTrip.prototype, "startDate", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], VehicleTrip.prototype, "routeId", void 0);
+VehicleTrip = __decorate([
+    type_graphql_1.ObjectType()
+], VehicleTrip);
 let Position = class Position {
 };
 __decorate([
@@ -34,6 +71,14 @@ __decorate([
     type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", Number)
 ], Position.prototype, "longitude", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], Position.prototype, "bearing", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], Position.prototype, "speed", void 0);
 Position = __decorate([
     type_graphql_1.ObjectType()
 ], Position);
@@ -41,30 +86,10 @@ let Vehicle = class Vehicle {
 };
 __decorate([
     type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", String)
-], Vehicle.prototype, "id", void 0);
+    __metadata("design:type", VehicleTrip)
+], Vehicle.prototype, "trip", void 0);
 __decorate([
     type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", Boolean)
-], Vehicle.prototype, "isDeleted", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", String)
-], Vehicle.prototype, "tripId", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", String)
-], Vehicle.prototype, "startTime", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", String)
-], Vehicle.prototype, "startDate", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", String)
-], Vehicle.prototype, "routeId", void 0);
-__decorate([
-    type_graphql_1.Field(() => Position, { nullable: true }),
     __metadata("design:type", Position)
 ], Vehicle.prototype, "position", void 0);
 __decorate([
@@ -73,33 +98,46 @@ __decorate([
 ], Vehicle.prototype, "currentStopSequence", void 0);
 __decorate([
     type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], Vehicle.prototype, "currentStatus", void 0);
 __decorate([
     type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], Vehicle.prototype, "timestamp", void 0);
 __decorate([
     type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Object)
+], Vehicle.prototype, "vehicle", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
-], Vehicle.prototype, "vehicleId", void 0);
+], Vehicle.prototype, "occupancyStatus", void 0);
 Vehicle = __decorate([
     type_graphql_1.ObjectType()
 ], Vehicle);
+let Entity = class Entity {
+};
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", String)
+], Entity.prototype, "id", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Vehicle)
+], Entity.prototype, "vehicle", void 0);
+Entity = __decorate([
+    type_graphql_1.ObjectType()
+], Entity);
 let Feed = class Feed {
 };
 __decorate([
-    type_graphql_1.Field(() => [Vehicle], { nullable: true }),
+    type_graphql_1.Field(() => Header, { nullable: true }),
+    __metadata("design:type", Header)
+], Feed.prototype, "header", void 0);
+__decorate([
+    type_graphql_1.Field(() => [Entity], { nullable: true }),
     __metadata("design:type", Array)
-], Feed.prototype, "feed", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", Number)
-], Feed.prototype, "timestamp", void 0);
-__decorate([
-    type_graphql_1.Field({ nullable: true }),
-    __metadata("design:type", Number)
-], Feed.prototype, "count", void 0);
+], Feed.prototype, "entity", void 0);
 Feed = __decorate([
     type_graphql_1.ObjectType()
 ], Feed);
