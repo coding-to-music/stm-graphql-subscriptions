@@ -23,10 +23,6 @@ export const WEBSOCKET =
 export const HTTP =
   process.env.NEXT_PUBLIC_HTTP || "http://localhost:4000/graphql";
 
-exports.CLIENT_ORIGIN = exports.DATABASE_URL = exports.REDIS_URL = exports.STMKEY = exports.DBPASSWORD = exports.DBUSERNAME = exports.DBNAME = exports.FORGET_PASSWORD_PREFIX = exports.SECRET = exports.COOKIE_NAME = exports.__prod__ = void 0;
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-exports.__prod__ = process.env.NODE_ENV === "production";
 exports.COOKIE_NAME = "qid";
 exports.SECRET = process.env.SECRET;
 exports.FORGET_PASSWORD_PREFIX = "forget-password:";
