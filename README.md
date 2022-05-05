@@ -280,6 +280,8 @@ GraphQL Playground will be available at:
 
 # // Tutorial //
 
+https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart
+
 # How To Install PostgreSQL on Ubuntu 20.04 [Quickstart]
 
 Published on April 23, 2020 · Updated on March 17, 2022
@@ -464,3 +466,163 @@ You are now set up with PostgreSQL on your Ubuntu 20.04 server. If you’d like 
 
 - A comparison of relational database management systems
 - Practice running queries with SQL
+
+Swayne
+Posted on Mar 23, 2021 • Updated on Apr 13, 2021
+
+# Deploying a PostgresQL, Redis, GraphQL backend and frontend the easiest way!
+
+https://dev.to/lastnameswayne/deploying-a-postgresql-redis-graphql-backend-and-frontend-the-easiest-way-4gob
+
+#
+
+docker
+
+#
+
+graphql
+
+#
+
+redis
+
+#
+
+nextjs
+Hey, Swayne here. I am currently in the process of trying out different backend-hosting options. I have used Heroku for a MERN-app, which was a decent experience but I like DigitalOcean better!
+
+Back-end📦
+Today I will be deploying a PSQL and Redis-server backend project. The hosting provider I will use is in a DigitalOcean droplet with Docker installed!
+
+DockerHub illustration
+
+In short: A digitalocean droplet is a virtual machine on a server, which will host your backend. You use dokku to setup your database and redis-server and then you can use Docker to push (upload) your code. After ssh'ing into your droplet you can docker pull the code and then build the app
+
+Stack:
+
+DigitalOcean🌊
+Dokku💧
+Docker🐳
+DockerHub💙
+Getting started!🔜
+First you will want to create an account on DigitalOcena, you can use this link to get $100 worth of credits for 60 days. Not an affiliate link 😂
+
+Setting up your droplet✏️
+Choose the datacenter nearest to you, for me that is Frankfurt. I set up monitoring as well, but that is personal preference.
+
+To generate an ssh key you will have to run:
+ssh-keygen
+After getting the key file in the default directory you can run
+cat ~/.ssh/id_rsa.pub
+And paste the contents in the window on DigitalOcean.
+
+Now you just need to give your droplet a name and wait for it to be ready!
+
+Setting up Dokku with PSQL and Redis🎮
+Next, you have to copy the ipv4 and paste it into your browser search field
+
+My droplet
+
+On this page you can scroll down and check off "Use virtualhost naming for apps" and press finish setup.
+
+Run this command in your terminal. This will let you be able to make commands in the digital ocean droplet's virtual machine.
+ssh root@[your code here]
+I will refer to this as "ssh into" your app.
+
+Create a dokku app with this command:
+dokku apps:create app
+The last value is the name, so I have named mine "app". Install PSQL by this command:
+sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
+The link links to documenation for the postgres for dokku plugin where you can find some commands. To create a database in dokku:
+dokku postgres:create database
+The last value is, once again, the name. To link the database named "database" to the app named "app". Note: the command takes the names:
+dokku postgres:link database app
+We are now done with the database for now.
+
+Moving on to redis, we are going to need the documentation for the plugin.
+sudo dokku plugin:install https://github.com/dokku/dokku-redis.git redis
+To create the redis-server on dokku:
+dokku redis:create server
+The last value is once again the name, so I have chosen "server".
+
+Now we have to link the server to the app. Again, by the names:
+dokku redis:link server app
+Now we are done with PSQL and Redis and ready to deploy our app. Verify that it worked by:
+docker container list
+You should see a redis- and postgres instance running.
+
+Docker🐳
+Depending on your application, you are going to need a different Dockerfile in your database project folder. I will be deploying a Node.js app, so mine looks like this:
+FROM node:14
+
+# Create app directory
+
+WORKDIR /usr/src/app
+
+# Install app dependencies
+
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+
+# where available (npm@5+)
+
+COPY package.json ./
+COPY yarn.lock ./
+COPY . .
+
+RUN yarn
+
+COPY .env.production .env
+
+RUN yarn build
+
+ENV NODE_ENV production
+
+EXPOSE 8080
+CMD [ "node", "dist/index.js" ]
+USER node
+A dockerfile is a set of instructions to run your app, and can therefore vary wildly between projects. I would recommend checking out the Docker docs, since it's a lengthy subject which I won't cover here.
+
+When your Dockerfile is ready, you can run docker build:
+docker build -t lastnameswayne/crudapp:1 .
+The format is: docker build -t /: .
+
+"lastnameswayne" is my username and "crudapp" is the app name which I want and it's version number one. Docker build will create an image which we will later push onto Docker Hub.
+
+If you are on an M1 Macbook (or any other ARM chip) you have to run this build-command instead
+docker buildx create --use
+docker buildx build --platform linux/amd64 --push -t lastnameswayne/crudapp:1 .
+Using these two commands we can build to the correct image, linux/amd64 instead of the default arm64. You might need to enable buildx in the docker settings under "experimental features".
+
+Using DockerHub to transfer your code 🫂
+Now it's time to visit Docker Hub and sign up/in. You might need to login from the command line aswell by running "docker login"
+
+Now, we can push our Docker Image onto Docker Hub:
+docker push lastnameswayne/crudapp:1
+You can reuse the name from the docker build command.
+
+We now need to use our server again, so ssh into your app again. We can pull the Docker image from Docker Hub by the command:
+docker pull lastnameswayne/crudapp:1
+We have now successfully pushed our code from our local computer into and pulled it into the ssh, using Docker as a sort of middleman. We are now almost done! Tag the image you just pulled down, so we can link it to the dokku app:
+docker tag lastnameswayne/crudapp:1 dokku/app:latest
+The last value you write as dokku/:
+
+In the beginning I named by dokku app "app" and "latest" is the tagname that I have chosen. We can now deploy using the tagname and appname.
+dokku deploy app latest
+If this command worked, your backend is now deployed on the droplet. Let's move on to the front-end. I also like to setup letsencrypt and a domain, but that's very project-specific so I didn't include it. But please, let me know if you need help. It's not difficult, just hard to show in an article =)
+
+Front-end⚛️
+I will be using Vercel to deply my React and next.js app. Vercel are the creator of next.js, and has made it relatively easy to deploy a front-end project using their platform.
+
+This is a lot easier. After making an account you can simply run
+vercel login
+vercel --prod
+Logs you into Vercel and creates a production build of your project, then deploys it to a server. This is all you really need.
+
+‼️Remember to set your environment variables‼️
+Back-end:
+
+Likely in your .env-file
+
+Front-end:
+
+In next.js you can set it in the settings on next.js and in your .env-file. Further instructions.
